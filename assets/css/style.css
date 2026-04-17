@@ -1,0 +1,64 @@
+body {
+  font-family: Segoe UI;
+  background: #f1f5f9;
+}
+
+.login-box {
+  max-width: 350px;
+  margin: 80px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+}
+
+input,
+button,
+select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+}
+
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background: #1e293b;
+  position: fixed;
+  color: white;
+  padding: 20px;
+}
+
+.content {
+  margin-left: 240px;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+table th {
+  background: #1e293b;
+  color: white;
+  padding: 10px;
+}
+
+table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+h2 {
+  margin-bottom: 15px;
+}
