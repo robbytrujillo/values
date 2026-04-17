@@ -1,5 +1,10 @@
 <?php include '../config/koneksi.php'; ?>
 
+<?php
+include '../config/auth.php';
+cek_role(['guru']);
+?>
+
 <form method="POST">
 
     <select name="siswa_id">

@@ -34,6 +34,7 @@ if(isset($_SESSION['user'])){
     <title>Sistem Analisa Nilai SMA</title>
     <link rel="stylesheet" href="assets/css/style.css">
 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
     /* tambahan khusus landing */
     .hero {

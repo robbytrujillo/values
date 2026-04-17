@@ -1,17 +1,30 @@
-<?php session_start(); ?>
+<?php 
+include '../config/auth.php';
+cek_role(['admin']);
+?>
+
 <link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
 
-<div class="sidebar">
-    <h2>Admin</h2>
-    <a href="siswa.php">Data Siswa</a>
-    <a href="guru.php">Data Guru</a>
-    <a href="mapel.php">Mapel</a>
+<?php include 'template.php'; ?>
+
+<div class="grid">
+
+    <div class="card">
+        <h3>Total Siswa</h3>
+        <p>100</p>
+    </div>
+
+    <div class="card">
+        <h3>Total Guru</h3>
+        <p>20</p>
+    </div>
+
+    <div class="card">
+        <h3>Total Mapel</h3>
+        <p>10</p>
+    </div>
+
 </div>
-
-<div class="content">
-    <h2>Dashboard</h2>
-
-    <div class="card">Total Siswa</div>
-    <div class="card">Total Guru</div>
 
 </div>
