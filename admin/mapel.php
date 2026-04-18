@@ -142,11 +142,11 @@ $pages = ceil($total / $limit);
 <body>
 
     <div class="sidebar">
-        <h2>📊 Admin</h2>
         <a href="dashboard.php">Dashboard</a>
         <a href="siswa.php">Data Siswa</a>
         <a href="guru.php">Data Guru</a>
         <a href="mapel.php">Data Mapel</a>
+        <a href="guru_mapel_kelas.php">Relasi Guru</a>
         <a href="ranking.php">Ranking</a>
         <a href="../auth/logout.php">Logout</a>
     </div>
