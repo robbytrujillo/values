@@ -147,6 +147,28 @@ table tr:hover {
   background: #dc2626;
 }
 
+/* tombol normal */
+.btn {
+  display: inline-block;
+  width: auto;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* variasi */
+.btn-success {
+  background: #10b981;
+}
+
+.btn:hover {
+  opacity: 0.9;
+}
+
 /* ===== RESPONSIVE ===== */
 @media (min-width: 768px) {
   .grid {
