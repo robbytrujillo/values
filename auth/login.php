@@ -15,7 +15,7 @@
     <style>
     body {
         font-family: 'Poppins', sans-serif;
-        background: linear-gradient(135deg, #4f46e5, #06b6d4);
+        background: linear-gradient(135deg, #e4e3ec, #d2d6d8);
         height: 100vh;
     }
 
@@ -53,7 +53,7 @@
                                 required>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-block">
+                        <button type="submit" class="btn btn-primary btn-block rounded-pill">
                             Masuk
                         </button>
 
