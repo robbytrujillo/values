@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
 
+    <link rel="icon" type="image/png" href="../assets/images/logo-sma.png">
+
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -37,7 +39,9 @@
             <div class="card shadow-lg">
                 <div class="card-body p-4">
 
-                    <h3 class="text-center mb-4">🔐 Login</h3>
+                    <h3 class="text-center mb-4">
+                        <img src="../assets/images/logo-sma.png" alt="Logo" width="30" class="mr-2"><b>Values.</b>
+                    </h3>
 
                     <form action="proses_login.php" method="POST">
 

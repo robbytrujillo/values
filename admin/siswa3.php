@@ -22,10 +22,7 @@ if(isset($_GET['download_template'])){
     $sheet->setCellValue('A1','nis');
     $sheet->setCellValue('B1','nama');
     $sheet->setCellValue('C1','kelas');
-
-    $sheet->setCellValue('A2','12345');
-    $sheet->setCellValue('B2','Budi');
-    $sheet->setCellValue('C2','X IPA 1');
+    $sheet->setCellValue('D1','angkatan');
 
     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     header('Content-Disposition: attachment; filename="template_siswa.xlsx"');
@@ -39,33 +36,20 @@ if(isset($_GET['download_template'])){
 $search = $_GET['search'] ?? '';
 
 $limit = 10;
-$page = max(1, (int)($_GET['page'] ?? 1));
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = ($page < 1) ? 1 : $page;
+
 $start = ($page - 1) * $limit;
 
 $where = "";
 if(!empty($search)){
     $s = mysqli_real_escape_string($conn,$search);
-    $where = "WHERE s.nis LIKE '%$s%' 
-              OR s.nama LIKE '%$s%' 
-              OR k.nama_kelas LIKE '%$s%'";
+    $where = "WHERE nis LIKE '%$s%' OR nama LIKE '%$s%' OR kelas LIKE '%$s%'";
 }
 
-// ================= QUERY =================
-$q = mysqli_query($conn,"
-SELECT s.*, k.nama_kelas 
-FROM siswa s
-LEFT JOIN kelas k ON s.kelas_id = k.id
-$where
-LIMIT $start,$limit
-");
+$q = mysqli_query($conn,"SELECT * FROM siswa $where LIMIT $start,$limit");
 
-$total = mysqli_fetch_assoc(mysqli_query($conn,"
-SELECT COUNT(*) as total 
-FROM siswa s
-LEFT JOIN kelas k ON s.kelas_id = k.id
-$where
-"))['total'];
-
+$total = mysqli_fetch_assoc(mysqli_query($conn,"SELECT COUNT(*) as total FROM siswa $where"))['total'];
 $pages = ceil($total / $limit);
 ?>
 
@@ -74,8 +58,10 @@ $pages = ceil($total / $limit);
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Siswa</title>
 
+    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -121,7 +107,6 @@ $pages = ceil($total / $limit);
 
                 <h5>Daftar Siswa</h5>
 
-                <!-- SEARCH -->
                 <form method="GET" class="form-inline mb-3">
                     <input type="text" name="search" class="form-control mr-2" placeholder="Cari siswa"
                         value="<?= htmlspecialchars($search) ?>">
@@ -140,33 +125,36 @@ $pages = ceil($total / $limit);
                                 <th>NIS</th>
                                 <th>Nama</th>
                                 <th>Kelas</th>
+                                <th>Angkatan</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
 
-                            <?php 
+                            <?php
                     $no = $start + 1;
-                    while($d=mysqli_fetch_array($q)){ 
+                    while($d=mysqli_fetch_array($q)){
                     ?>
                             <tr>
-                                <td><?= $no++ ?></td>
+                                <td><?= $no ?></td>
                                 <td><?= htmlspecialchars($d['nis']) ?></td>
                                 <td><?= htmlspecialchars($d['nama']) ?></td>
-                                <td><?= htmlspecialchars($d['nama_kelas']) ?></td>
+                                <td><?= htmlspecialchars($d['kelas']) ?></td>
+                                <td><?= htmlspecialchars($d['angkatan']) ?></td>
                                 <td>
                                     <button class="btn btn-warning btn-sm" onclick="editData(
                                     '<?= $d['id'] ?>',
                                     '<?= htmlspecialchars($d['nis'],ENT_QUOTES) ?>',
                                     '<?= htmlspecialchars($d['nama'],ENT_QUOTES) ?>',
-                                    '<?= $d['kelas_id'] ?>'
+                                    '<?= htmlspecialchars($d['kelas'],ENT_QUOTES) ?>',
+                                    '<?= htmlspecialchars($d['angkatan'],ENT_QUOTES) ?>'
                                 )">Edit</button>
 
                                     <a href="?hapus=<?= $d['id'] ?>" class="btn btn-danger btn-sm"
                                         onclick="return confirm('Yakin?')">Hapus</a>
                                 </td>
                             </tr>
-                            <?php } ?>
+                            <?php $no++; } ?>
 
                         </tbody>
                     </table>
@@ -196,7 +184,6 @@ $pages = ceil($total / $limit);
             <div class="modal-content">
 
                 <form method="POST">
-
                     <div class="modal-header">
                         <h5 class="modal-title" id="modalTitle">Tambah Siswa</h5>
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -216,18 +203,14 @@ $pages = ceil($total / $limit);
                             <input type="text" name="nama" id="nama" class="form-control" required>
                         </div>
 
-                        <!-- KELAS DINAMIS -->
                         <div class="form-group">
                             <label>Kelas</label>
-                            <select name="kelas_id" id="kelas_id" class="form-control" required>
-                                <option value="">-- Pilih Kelas --</option>
-                                <?php
-                            $kelas = mysqli_query($conn,"SELECT * FROM kelas");
-                            while($k = mysqli_fetch_array($kelas)){
-                                echo "<option value='$k[id]'>$k[nama_kelas]</option>";
-                            }
-                            ?>
-                            </select>
+                            <input type="text" name="kelas" id="kelas" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Angkatan</label>
+                            <input type="text" name="angkatan" id="angkatan" class="form-control" required>
                         </div>
 
                     </div>
@@ -249,11 +232,8 @@ $pages = ceil($total / $limit);
 
     <?php include 'template_footer.php'; ?>
 
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
-
     <script>
-    function editData(id, nis, nama, kelas_id) {
+    function editData(id, nis, nama, kelas, angkatan) {
         $('#modalForm').modal('show');
 
         document.getElementById('modalTitle').innerText = 'Edit Siswa';
@@ -267,7 +247,8 @@ $pages = ceil($total / $limit);
         document.getElementById('id').value = id;
         document.getElementById('nis').value = nis;
         document.getElementById('nama').value = nama;
-        document.getElementById('kelas_id').value = kelas_id;
+        document.getElementById('kelas').value = kelas;
+        document.getElementById('angkatan').value = angkatan;
     }
     </script>
 
@@ -276,71 +257,54 @@ $pages = ceil($total / $limit);
 </html>
 
 <?php
-// ================= SIMPAN =================
+// SIMPAN
 if(isset($_POST['simpan'])){
 $nis = mysqli_real_escape_string($conn,$_POST['nis']);
 $nama = mysqli_real_escape_string($conn,$_POST['nama']);
-$kelas_id = $_POST['kelas_id'];
+$kelas = mysqli_real_escape_string($conn,$_POST['kelas']);
+$angkatan = mysqli_real_escape_string($conn,$_POST['angkatan']);
 
-mysqli_query($conn,"INSERT INTO siswa (nis,nama,kelas_id)
-VALUES ('$nis','$nama','$kelas_id')");
-
+mysqli_query($conn,"INSERT INTO siswa (nis,nama,kelas,angkatan)
+VALUES ('$nis','$nama','$kelas','$angkatan')");
 echo "<script>location='siswa.php';</script>";
 }
 
-// ================= UPDATE =================
+// UPDATE
 if(isset($_POST['update'])){
 mysqli_query($conn,"UPDATE siswa SET 
 nis='$_POST[nis]',
 nama='$_POST[nama]',
-kelas_id='$_POST[kelas_id]'
+kelas='$_POST[kelas]',
+angkatan='$_POST[angkatan]'
 WHERE id='$_POST[id]'");
-
 echo "<script>location='siswa.php';</script>";
 }
 
-// ================= HAPUS =================
+// HAPUS
 if(isset($_GET['hapus'])){
 mysqli_query($conn,"DELETE FROM siswa WHERE id='$_GET[hapus]'");
 echo "<script>location='siswa.php';</script>";
 }
 
-// ================= IMPORT =================
+// IMPORT
 if(isset($_POST['import_excel'])){
     if(!$excel_ready){
         echo "<script>alert('Library belum ada');</script>";
         exit;
     }
 
-    $file = $_FILES['file']['tmp_name'];
-    $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
-    $sheet = $spreadsheet->getActiveSheet()->toArray();
+    $file=$_FILES['file']['tmp_name'];
+    $spreadsheet=\PhpOffice\PhpSpreadsheet\IOFactory::load($file);
+    $sheet=$spreadsheet->getActiveSheet()->toArray();
 
     foreach($sheet as $i=>$row){
         if($i==0) continue;
 
-        $nis   = mysqli_real_escape_string($conn,$row[0]);
-        $nama  = mysqli_real_escape_string($conn,$row[1]);
-        $kelas = mysqli_real_escape_string($conn,$row[2]);
+        $nis=mysqli_real_escape_string($conn,$row[0]);
+        if(empty($nis)) continue;
 
-        if(empty($nis) || empty($kelas)) continue;
-
-        // cari kelas_id dari nama_kelas
-        $k = mysqli_fetch_assoc(mysqli_query($conn,"
-            SELECT id FROM kelas WHERE nama_kelas='$kelas'
-        "));
-
-        if(!$k){
-            // jika kelas tidak ditemukan, skip
-            continue;
-        }
-
-        $kelas_id = $k['id'];
-
-        mysqli_query($conn,"
-            INSERT INTO siswa (nis,nama,kelas_id)
-            VALUES ('$nis','$nama','$kelas_id')
-        ");
+        mysqli_query($conn,"INSERT INTO siswa (nis,nama,kelas,angkatan)
+        VALUES ('$nis','$row[1]','$row[2]','$row[3]')");
     }
 
     echo "<script>alert('Import berhasil');location='siswa.php';</script>";

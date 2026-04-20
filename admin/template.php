@@ -54,6 +54,7 @@
                 <a href="siswa.php">Data Siswa</a>
                 <a href="guru.php">Data Guru</a>
                 <a href="mapel.php">Data Mapel</a>
+                <a href="mengajar.php">Data Mengajar</a>
                 <a href="ranking.php">Ranking</a>
                 <a href="../auth/logout.php">Logout</a>
             </nav>

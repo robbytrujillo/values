@@ -22,6 +22,8 @@ if(isset($_SESSION['user'])){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Analisa Nilai SMA</title>
 
+    <link rel="icon" type="image/png" href="assets/images/logo-sma.png">
+
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -128,7 +130,9 @@ if(isset($_SESSION['user'])){
     <!-- NAVBAR -->
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
-            <a class="navbar-brand font-weight-bold" href="#">📊 Nilai SMA</a>
+            <a class="navbar-brand font-weight-bold" href="#"><img src="assets/images/logo-sma.png" alt="Logo"
+                    width="30" class="mr-2">
+                Values.</a>
 
             <div class="ml-auto d-flex align-items-center">
                 <button onclick="toggleDark()" id="themeToggle" class="dark-toggle mr-3">
@@ -205,7 +209,7 @@ if(isset($_SESSION['user'])){
 
     <!-- FOOTER -->
     <footer class="text-center py-3 bg-light border-top mt-auto">
-        <div class="small">
+        <div class="small" style="font-weight: bold;">
             Copyright &copy; <?= date('Y'); ?>
             <a href="https://robbyilham.com/" target="_blank">by</a>
             IT Development IHBS
