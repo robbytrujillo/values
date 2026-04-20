@@ -1,26 +1,15 @@
 <?php
 session_start();
 
-// Jika sudah login → redirect sesuai role
 if(isset($_SESSION['user'])){
     $role = $_SESSION['user']['role'];
 
     switch($role){
-        case 'admin':
-            header("Location: admin/dashboard.php");
-            exit;
-        case 'guru':
-            header("Location: guru/input_nilai.php");
-            exit;
-        case 'walas':
-            header("Location: walas/dashboard.php");
-            exit;
-        case 'kurikulum':
-            header("Location: kurikulum/dashboard.php");
-            exit;
-        case 'siswa':
-            header("Location: siswa/dashboard.php");
-            exit;
+        case 'admin': header("Location: admin/dashboard.php"); exit;
+        case 'guru': header("Location: guru/input_nilai.php"); exit;
+        case 'walas': header("Location: walas/dashboard.php"); exit;
+        case 'kurikulum': header("Location: kurikulum/dashboard.php"); exit;
+        case 'siswa': header("Location: siswa/dashboard.php"); exit;
     }
 }
 ?>
@@ -32,83 +21,238 @@ if(isset($_SESSION['user'])){
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Analisa Nilai SMA</title>
-    <link rel="stylesheet" href="assets/css/style.css">
 
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- AOS -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+    <!-- Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
     <style>
-    /* tambahan khusus landing */
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: #f5f7fb;
+        color: #000;
+        transition: 0.3s;
+    }
+
+    /* DARK MODE */
+    body.dark {
+        background: #0f172a;
+        color: #fff;
+    }
+
+    /* semua text ikut berubah */
+    body.dark h1,
+    body.dark h2,
+    body.dark h3,
+    body.dark p,
+    body.dark span,
+    body.dark a {
+        color: #fff !important;
+    }
+
+    /* navbar */
+    body.dark .navbar {
+        background: #1e293b !important;
+    }
+
+    /* card */
+    body.dark .card {
+        background: #1e293b;
+        color: #fff;
+    }
+
+    /* footer tetap terang */
+    footer {
+        color: #333 !important;
+    }
+
+    body.dark footer {
+        background: #f8f9fa !important;
+        color: #333 !important;
+    }
+
+    /* hero */
     .hero {
+        padding: 100px 20px;
         text-align: center;
-        padding: 60px 20px;
     }
 
     .hero h1 {
-        font-size: 28px;
-        margin-bottom: 10px;
+        font-weight: 600;
     }
 
-    .hero p {
-        color: #555;
-        margin-bottom: 20px;
-    }
-
-    .btn-login {
-        display: inline-block;
-        padding: 12px 25px;
-        background: #1e293b;
-        color: white;
-        border-radius: 10px;
-        text-decoration: none;
-    }
-
-    .features {
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 15px;
-        padding: 20px;
-    }
-
+    /* card animasi */
     .feature-card {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        border-radius: 15px;
+        transition: 0.3s;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-8px);
+    }
+
+    /* button */
+    .btn-main {
+        border-radius: 50px;
+        padding: 10px 25px;
+    }
+
+    /* toggle icon */
+    .dark-toggle {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    footer a {
+        color: #007bff !important;
+        /* tetap biru */
+    }
+
+    body.dark footer a {
+        color: #007bff !important;
+        /* paksa tetap biru saat dark */
     }
     </style>
 
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
 
-    <div class="hero">
-        <h1>📊 Sistem Analisa Nilai SMA</h1>
-        <p>Aplikasi pengolahan nilai, ranking, dan raport siswa</p>
-        <a href="auth/login.php" class="btn-login">Login Sekarang</a>
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand font-weight-bold" href="#">📊 Nilai SMA</a>
+
+            <div class="ml-auto d-flex align-items-center">
+                <button onclick="toggleDark()" id="themeToggle" class="dark-toggle mr-3">
+                    🌙
+                </button>
+
+                <a href="auth/login.php" class="btn btn-primary btn-main">
+                    Login
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- CONTENT -->
+    <div class="flex-grow-1">
+
+        <!-- HERO -->
+        <section class="hero container">
+            <h1 data-aos="fade-up">Sistem Analisa Nilai SMA</h1>
+
+            <p class="text-muted mt-3" data-aos="fade-up" data-aos-delay="100">
+                Kelola nilai siswa, ranking, dan raport secara otomatis & modern
+            </p>
+
+            <a href="auth/login.php" class="btn btn-primary btn-main mt-3" data-aos="fade-up" data-aos-delay="200">
+                Mulai Sekarang
+            </a>
+        </section>
+
+        <!-- FEATURES -->
+        <section class="container mb-5">
+            <div class="row">
+
+                <div class="col-md-6 col-lg-3 mb-4" data-aos="fade-up">
+                    <div class="card feature-card shadow-sm h-100 text-center">
+                        <div class="card-body">
+                            <h5>📌 Manajemen Nilai</h5>
+                            <p class="text-muted">Input nilai siswa cepat</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3 mb-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="card feature-card shadow-sm h-100 text-center">
+                        <div class="card-body">
+                            <h5>🏆 Ranking Otomatis</h5>
+                            <p class="text-muted">Ranking realtime</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3 mb-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="card feature-card shadow-sm h-100 text-center">
+                        <div class="card-body">
+                            <h5>📄 Raport Digital</h5>
+                            <p class="text-muted">Cetak raport modern</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-3 mb-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="card feature-card shadow-sm h-100 text-center">
+                        <div class="card-body">
+                            <h5>📈 Grafik Nilai</h5>
+                            <p class="text-muted">Statistik visual</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
     </div>
 
-    <div class="features">
-
-        <div class="feature-card">
-            <h3>📌 Manajemen Nilai</h3>
-            <p>Input nilai siswa oleh guru secara mudah dan cepat</p>
+    <!-- FOOTER -->
+    <footer class="text-center py-3 bg-light border-top mt-auto">
+        <div class="small">
+            Copyright &copy; <?= date('Y'); ?>
+            <a href="https://robbyilham.com/" target="_blank">by</a>
+            IT Development IHBS
         </div>
+    </footer>
 
-        <div class="feature-card">
-            <h3>🏆 Ranking Otomatis</h3>
-            <p>Ranking kelas, angkatan, dan sekolah secara realtime</p>
-        </div>
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
-        <div class="feature-card">
-            <h3>📄 Raport Digital</h3>
-            <p>Cetak raport lengkap dengan deskripsi dan tanda tangan</p>
-        </div>
+    <!-- AOS -->
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 
-        <div class="feature-card">
-            <h3>📈 Grafik Nilai</h3>
-            <p>Visualisasi statistik nilai siswa dan mapel</p>
-        </div>
+    <script>
+    AOS.init({
+        duration: 800,
+        once: true
+    });
 
-    </div>
+    /* TOGGLE DARK MODE */
+    function toggleDark() {
+        document.body.classList.toggle('dark');
+
+        let btn = document.getElementById('themeToggle');
+
+        if (document.body.classList.contains('dark')) {
+            localStorage.setItem('theme', 'dark');
+            btn.innerHTML = '☀️';
+        } else {
+            localStorage.setItem('theme', 'light');
+            btn.innerHTML = '🌙';
+        }
+    }
+
+    /* LOAD THEME */
+    window.onload = function() {
+        let theme = localStorage.getItem('theme');
+        let btn = document.getElementById('themeToggle');
+
+        if (theme === 'dark') {
+            document.body.classList.add('dark');
+            btn.innerHTML = '☀️';
+        } else {
+            btn.innerHTML = '🌙';
+        }
+    }
+    </script>
 
 </body>
 

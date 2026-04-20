@@ -1,23 +1,73 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(135deg, #4f46e5, #06b6d4);
+        height: 100vh;
+    }
+
+    .login-container {
+        height: 100vh;
+    }
+
+    .card {
+        border-radius: 15px;
+    }
+    </style>
 </head>
 
 <body>
 
-    <div class="login-box">
-        <form action="proses_login.php" method="POST">
-            <h2>Login</h2>
+    <div class="container login-container d-flex justify-content-center align-items-center">
+        <div class="col-md-4 col-12">
 
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
+            <div class="card shadow-lg">
+                <div class="card-body p-4">
 
-            <button type="submit">Masuk</button>
-        </form>
+                    <h3 class="text-center mb-4">🔐 Login</h3>
+
+                    <form action="proses_login.php" method="POST">
+
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input type="text" name="username" class="form-control" placeholder="Masukkan username"
+                                required>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Masukkan password"
+                                required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block">
+                            Masuk
+                        </button>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
     </div>
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

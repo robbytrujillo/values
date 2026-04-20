@@ -81,186 +81,249 @@ if(isset($_GET['download_template'])){
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Input Nilai</title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/admin.css">
-    <style>
-    .modal {
-        display: none;
-        /* WAJIB */
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
 
-        background: rgba(0, 0, 0, 0.5);
-
-        z-index: 9999;
-
-        justify-content: center;
-        align-items: center;
-    }
-
-    .modal-content {
-        background: #fff;
-        padding: 20px;
-        border-radius: 12px;
-
-        width: 90%;
-        max-width: 420px;
-
-        position: relative;
-    }
-    </style>
-
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
 
-    <div class="sidebar">
-        <h2>Guru</h2>
-        <a href="dashboard.php">Dashboard</a>
-        <a href="input_nilai.php">Input Nilai</a>
-        <a href="../auth/logout.php">Logout</a>
-    </div>
+    <div class="container-fluid flex-grow-1">
+        <div class="row">
 
-    <div class="content">
+            <!-- SIDEBAR -->
+            <nav class="col-md-2 d-none d-md-block bg-dark text-white" style="min-height:100vh;">
+                <h5 class="text-center mt-3">👨‍🏫 Guru</h5>
 
-        <div class="navbar">
-            <h3>Input Nilai</h3>
-            <div><?= $_SESSION['user']['nama']; ?></div>
-        </div>
+                <a href="dashboard.php" class="d-block text-light p-2">Dashboard</a>
+                <a href="input_nilai.php" class="d-block text-light p-2 bg-secondary">Input Nilai</a>
+                <a href="../auth/logout.php" class="d-block text-light p-2">Logout</a>
+            </nav>
 
-        <button class="btn" onclick="openModal()">+ Input Nilai</button>
+            <!-- CONTENT -->
+            <main class="col-md-10 p-4 d-flex flex-column">
 
-        <br><br>
+                <!-- HEADER -->
+                <div class="d-flex justify-content-between mb-3">
+                    <h4>Input Nilai</h4>
+                    <div><?= $_SESSION['user']['nama']; ?></div>
+                </div>
 
-        <!-- IMPORT -->
-        <div class="card">
-            <h3>Import Excel</h3>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <!-- BUTTON -->
+                        <button class="btn btn-primary mb-3 mr-2 rounded-pill" data-toggle="modal"
+                            data-target="#modalForm">
+                            Input Nilai
+                        </button>
+                    </div>
+                </div>
 
-            <form method="POST" enctype="multipart/form-data">
-                <input type="file" name="file" required>
-                <button class="btn" name="import_excel">Import</button>
-                <a href="?download_template=1" class="btn">Template</a>
-            </form>
-        </div>
+                <!-- IMPORT -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5>Import Excel</h5>
 
-        <!-- TABLE -->
-        <div class="card">
-            <h3>Data Nilai</h3>
+                        <form method="POST" enctype="multipart/form-data" class="form-inline">
+                            <input type="file" name="file" class="form-control mr-2 mb-2" required>
+                            <button class="btn btn-success mr-2 mb-2" name="import_excel">Import</button>
+                            <a href="?download_template=1" class="btn btn-info mb-2">Template</a>
+                        </form>
+                    </div>
+                </div>
 
-            <table>
-                <tr>
-                    <th>No</th>
-                    <th>Siswa</th>
-                    <th>Kelas</th>
-                    <th>Mapel</th>
-                    <th>Nilai</th>
-                    <th>Aksi</th>
-                </tr>
+                <!-- TABLE -->
+                <div class="card">
+                    <div class="card-body">
 
-                <?php $no=$start+1; while($d=mysqli_fetch_array($q)){ ?>
-                <tr>
-                    <td><?= $no++ ?></td>
-                    <td><?= $d['nama_siswa'] ?></td>
-                    <td><?= $d['kelas'] ?></td>
-                    <td><?= $d['nama_mapel'] ?></td>
-                    <td><?= $d['nilai'] ?></td>
-                    <td>
-                        <a href="#" onclick="editData(
-'<?= $d['id'] ?>',
-'<?= $d['siswa_id'] ?>',
-'<?= $d['mapel_id'] ?>',
-'<?= $d['nilai'] ?>',
-'<?= htmlspecialchars($d['deskripsi'],ENT_QUOTES) ?>',
-'<?= $d['kelas'] ?>'
-)">Edit</a>
-                    </td>
-                </tr>
-                <?php } ?>
-            </table>
+                        <h5>Data Nilai</h5>
 
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Siswa</th>
+                                        <th>Kelas</th>
+                                        <th>Mapel</th>
+                                        <th>Nilai</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <?php $no=$start+1; while($d=mysqli_fetch_array($q)){ ?>
+                                    <tr>
+                                        <td><?= $no++ ?></td>
+                                        <td><?= $d['nama_siswa'] ?></td>
+                                        <td><?= $d['kelas'] ?></td>
+                                        <td><?= $d['nama_mapel'] ?></td>
+                                        <td><?= $d['nilai'] ?></td>
+                                        <td>
+                                            <button class="btn btn-warning btn-sm" onclick="editData(
+                                                '<?= $d['id'] ?>',
+                                                '<?= $d['siswa_id'] ?>',
+                                                '<?= $d['mapel_id'] ?>',
+                                                '<?= $d['nilai'] ?>',
+                                                '<?= htmlspecialchars($d['deskripsi'],ENT_QUOTES) ?>',
+                                                '<?= $d['kelas'] ?>'
+                                                )">Edit</button>
+                                        </td>
+                                    </tr>
+                                    <?php } ?>
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- FOOTER -->
+                <footer class="mt-auto text-center py-3 border-top mt-4">
+                    <small>© <?= date('Y') ?> IT Development IHBS</small>
+                </footer>
+
+            </main>
         </div>
     </div>
 
     <!-- MODAL -->
-    <div class="modal" id="modalForm">
-        <div class="modal-content">
+    <div class="modal fade" id="modalForm">
+        <div class="modal-dialog">
+            <div class="modal-content">
 
-            <h3 id="modalTitle">Input Nilai</h3>
+                <form method="POST">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Input Nilai</h5>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
 
-            <form method="POST">
+                    <div class="modal-body">
 
-                <input type="hidden" name="id" id="id">
+                        <input type="hidden" name="id" id="id">
 
-                <select id="kelas_filter" onchange="filterSiswa()" required>
-                    <option value="">-- Kelas --</option>
+                        <div class="form-group">
+                            <label>Kelas</label>
+                            <select id="kelas_filter" class="form-control" onchange="filterSiswa()" required>
+                                <option value="">-- Kelas --</option>
+                                <?php
+                            $kelas = mysqli_query($conn,"SELECT DISTINCT kelas FROM siswa WHERE kelas IN ($kelas_str)");
+                            while($k=mysqli_fetch_array($kelas)){
+                                echo "<option value='$k[kelas]'>$k[kelas]</option>";
+                            }
+                            ?>
+                            </select>
+                        </div>
 
-                    <?php
-$kelas = mysqli_query($conn,"
-SELECT DISTINCT kelas 
-FROM siswa 
-WHERE kelas IN ($kelas_str)
-");
-while($k=mysqli_fetch_array($kelas)){
-echo "<option value='$k[kelas]'>$k[kelas]</option>";
-}
-?>
-                </select>
+                        <div class="form-group">
+                            <label>Siswa</label>
+                            <select name="siswa_id" id="siswa_id" class="form-control" required>
+                                <option value="">-- Siswa --</option>
+                                <?php
+                            $siswa = mysqli_query($conn,"SELECT * FROM siswa WHERE kelas IN ($kelas_str)");
+                            while($s=mysqli_fetch_array($siswa)){
+                                echo "<option value='$s[id]' data-kelas='$s[kelas]'>$s[nama]</option>";
+                            }
+                            ?>
+                            </select>
+                        </div>
 
-                <select name="siswa_id" id="siswa_id" required>
-                    <option value="">-- Siswa --</option>
-                    <?php
-$siswa = mysqli_query($conn,"
-SELECT * FROM siswa WHERE kelas IN ($kelas_str)
-");
-while($s=mysqli_fetch_array($siswa)){
-echo "<option value='$s[id]' data-kelas='$s[kelas]'>$s[nama]</option>";
-}
-?>
-                </select>
+                        <div class="form-group">
+                            <label>Mapel</label>
+                            <select name="mapel_id" id="mapel_id" class="form-control" required>
+                                <option value="">-- Mapel --</option>
+                                <?php
+                            $mapel = mysqli_query($conn,"SELECT * FROM mapel WHERE id IN ($mapel_ids_str)");
+                            while($m=mysqli_fetch_array($mapel)){
+                                echo "<option value='$m[id]'>$m[nama_mapel]</option>";
+                            }
+                            ?>
+                            </select>
+                        </div>
 
-                <select name="mapel_id" id="mapel_id" required>
-                    <option value="">-- Mapel --</option>
-                    <?php
-$mapel = mysqli_query($conn,"
-SELECT * FROM mapel WHERE id IN ($mapel_ids_str)
-");
-while($m=mysqli_fetch_array($mapel)){
-echo "<option value='$m[id]'>$m[nama_mapel]</option>";
-}
-?>
-                </select>
+                        <div class="form-group">
+                            <label>Nilai</label>
+                            <input type="number" name="nilai" id="nilai" class="form-control" required>
+                        </div>
 
-                <input type="number" name="nilai" id="nilai" required>
-                <textarea name="deskripsi" id="deskripsi"></textarea>
+                        <div class="form-group">
+                            <label>Deskripsi</label>
+                            <textarea name="deskripsi" id="deskripsi" class="form-control"></textarea>
+                        </div>
 
-                <button name="simpan" id="btnSubmit">Simpan</button>
+                    </div>
 
-            </form>
+                    <div class="modal-footer">
+                        <button type="submit" name="simpan" id="btnSubmit" class="btn btn-primary">Simpan</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    </div>
+
+                </form>
+
+            </div>
         </div>
     </div>
 
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
     function openModal() {
-        document.getElementById('modalForm').style.display = 'flex';
+        const modal = document.getElementById('modalForm');
+        modal.style.display = 'flex';
+
+        // reset form
+        document.getElementById('id').value = '';
+        document.getElementById('kelas_filter').value = '';
+        document.getElementById('siswa_id').value = '';
+        document.getElementById('mapel_id').value = '';
+        document.getElementById('nilai').value = '';
+        document.getElementById('deskripsi').value = '';
+
+        let btn = document.getElementById('btnSubmit');
+        btn.name = 'simpan';
+        btn.innerText = 'Simpan';
+    }
+
+    function closeModal() {
+        document.getElementById('modalForm').style.display = 'none';
     }
 
     function editData(id, siswa, mapel, nilai, desk, kelas) {
-        openModal();
+        $('#modalForm').modal('show');
 
+        // isi dulu data basic
         document.getElementById('id').value = id;
         document.getElementById('kelas_filter').value = kelas;
-        filterSiswa();
-        document.getElementById('siswa_id').value = siswa;
+
+        // jalankan filter setelah modal benar-benar tampil
+        $('#modalForm').on('shown.bs.modal', function() {
+
+            filterSiswa();
+
+            // set value siswa setelah filter
+            document.getElementById('siswa_id').value = siswa;
+
+            // remove event supaya tidak double
+            $(this).off('shown.bs.modal');
+        });
+
         document.getElementById('mapel_id').value = mapel;
         document.getElementById('nilai').value = nilai;
         document.getElementById('deskripsi').value = desk;
+
+        let btn = document.getElementById('btnSubmit');
+        btn.name = 'update';
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-warning');
+        btn.innerText = 'Update';
     }
 
     function filterSiswa() {
@@ -269,11 +332,22 @@ echo "<option value='$m[id]'>$m[nama_mapel]</option>";
 
         for (let i = 0; i < opt.length; i++) {
             let o = opt[i];
-            if (!o.dataset.kelas) {
-                continue;
-            }
 
-            o.style.display = (o.dataset.kelas === kelas) ? 'block' : 'none';
+            if (!o.dataset.kelas) continue;
+
+            if (kelas === "") {
+                o.style.display = 'block';
+            } else {
+                o.style.display = (o.dataset.kelas === kelas) ? 'block' : 'none';
+            }
+        }
+    }
+
+    // klik luar modal = close
+    window.onclick = function(e) {
+        const modal = document.getElementById('modalForm');
+        if (e.target === modal) {
+            closeModal();
         }
     }
     </script>
