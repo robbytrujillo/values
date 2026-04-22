@@ -131,15 +131,14 @@ if(isset($_SESSION['user'])){
     <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
         <div class="container">
             <a class="navbar-brand font-weight-bold" href="#"><img src="assets/images/logo-sma.png" alt="Logo"
-                    width="30" class="mr-2">
-                Values.</a>
+                    width="30" class="mr-2">Values.</a>
 
             <div class="ml-auto d-flex align-items-center">
                 <button onclick="toggleDark()" id="themeToggle" class="dark-toggle mr-3">
                     🌙
                 </button>
 
-                <a href="auth/login.php" class="btn btn-primary btn-main">
+                <a href="auth/login.php" class="btn btn-primary btn-sm btn-main">
                     Login
                 </a>
             </div>

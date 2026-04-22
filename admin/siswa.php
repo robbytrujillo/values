@@ -10,47 +10,69 @@ if(file_exists('../vendor/autoload.php')){
     $excel_ready = true;
 }
 
-// ================= DOWNLOAD TEMPLATE =================
-if(isset($_GET['download_template'])){
-    if(!$excel_ready){
-        die('PhpSpreadsheet belum terinstall');
+/* ================= HANDLE ACTION ================= */
+
+// SIMPAN
+if(isset($_POST['simpan'])){
+    $nisn = mysqli_real_escape_string($conn,$_POST['nisn']);
+    $nama = mysqli_real_escape_string($conn,$_POST['nama']);
+    $kelas_id = $_POST['kelas_id'];
+
+    if(empty($nisn) || empty($nama) || empty($kelas_id)){
+        die("Data tidak lengkap");
     }
 
-    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-    $sheet = $spreadsheet->getActiveSheet();
+    $username = $nisn;
+    $password = password_hash('password', PASSWORD_DEFAULT);
 
-    $sheet->setCellValue('A1','nis');
-    $sheet->setCellValue('B1','nama');
-    $sheet->setCellValue('C1','kelas');
+    mysqli_query($conn,"
+        INSERT INTO siswa (nisn,nama,kelas_id,username,password)
+        VALUES ('$nisn','$nama','$kelas_id','$username','$password')
+    ");
 
-    $sheet->setCellValue('A2','12345');
-    $sheet->setCellValue('B2','Budi');
-    $sheet->setCellValue('C2','X IPA 1');
-
-    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    header('Content-Disposition: attachment; filename="template_siswa.xlsx"');
-
-    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-    $writer->save('php://output');
+    header("Location: siswa.php");
     exit;
 }
 
-// ================= SEARCH & PAGINATION =================
-$search = $_GET['search'] ?? '';
+// UPDATE
+if(isset($_POST['update'])){
+    $nisn = mysqli_real_escape_string($conn,$_POST['nisn']);
+    $nama = mysqli_real_escape_string($conn,$_POST['nama']);
+    $kelas_id = $_POST['kelas_id'];
 
+    mysqli_query($conn,"UPDATE siswa SET 
+        nisn='$nisn',
+        nama='$nama',
+        kelas_id='$kelas_id'
+        WHERE id='$_POST[id]'
+    ");
+
+    header("Location: siswa.php");
+    exit;
+}
+
+// HAPUS
+if(isset($_GET['hapus'])){
+    mysqli_query($conn,"DELETE FROM siswa WHERE id='$_GET[hapus]'");
+    header("Location: siswa.php");
+    exit;
+}
+
+/* ================= DATA ================= */
+
+$search = $_GET['search'] ?? '';
 $limit = 10;
-$page = max(1, (int)($_GET['page'] ?? 1));
-$start = ($page - 1) * $limit;
+$page = max(1,(int)($_GET['page'] ?? 1));
+$start = ($page-1)*$limit;
 
 $where = "";
-if(!empty($search)){
+if($search){
     $s = mysqli_real_escape_string($conn,$search);
-    $where = "WHERE s.nis LIKE '%$s%' 
+    $where = "WHERE s.nisn LIKE '%$s%' 
               OR s.nama LIKE '%$s%' 
               OR k.nama_kelas LIKE '%$s%'";
 }
 
-// ================= QUERY =================
 $q = mysqli_query($conn,"
 SELECT s.*, k.nama_kelas 
 FROM siswa s
@@ -66,7 +88,71 @@ LEFT JOIN kelas k ON s.kelas_id = k.id
 $where
 "))['total'];
 
-$pages = ceil($total / $limit);
+$pages = ceil($total/$limit);
+
+// ================= TEMPLATE EXCEL =================
+if(isset($_GET['download_template'])){
+    if(!$excel_ready){
+        die('PhpSpreadsheet belum terinstall');
+    }
+
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    $sheet->setCellValue('A1','nisn');
+    $sheet->setCellValue('B1','nama');
+    $sheet->setCellValue('C1','kelas');
+
+    $sheet->setCellValue('A2','1234567890');
+    $sheet->setCellValue('B2','Budi Santoso');
+    $sheet->setCellValue('C2','X IPA 1');
+
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="template_siswa.xlsx"');
+
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    $writer->save('php://output');
+    exit;
+}
+
+// ================= IMPORT =================
+if(isset($_POST['import_excel'])){
+    if(!$excel_ready){
+        die('Library belum ada');
+    }
+
+    $file = $_FILES['file']['tmp_name'];
+    $sheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file)->getActiveSheet()->toArray();
+
+    foreach($sheet as $i => $row){
+        if($i == 0) continue;
+
+        $nisn  = mysqli_real_escape_string($conn, $row[0]);
+        $nama  = mysqli_real_escape_string($conn, $row[1]);
+        $kelas = mysqli_real_escape_string($conn, $row[2]);
+
+        if(empty($nisn) || empty($kelas)) continue;
+
+        $k = mysqli_fetch_assoc(mysqli_query($conn,"
+            SELECT id FROM kelas WHERE nama_kelas='$kelas'
+        "));
+
+        if(!$k) continue;
+
+        $kelas_id = $k['id'];
+
+        $username = $nisn;
+        $password = password_hash('password', PASSWORD_DEFAULT);
+
+        mysqli_query($conn,"
+            INSERT INTO siswa (nisn,nama,kelas_id,username,password)
+            VALUES ('$nisn','$nama','$kelas_id','$username','$password')
+        ");
+    }
+
+    header("Location: siswa.php");
+    exit;
+}
 ?>
 
 <!DOCTYPE html>
@@ -75,7 +161,6 @@ $pages = ceil($total / $limit);
 <head>
     <meta charset="UTF-8">
     <title>Data Siswa</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
@@ -83,96 +168,89 @@ $pages = ceil($total / $limit);
 
     <?php include 'template.php'; ?>
 
-    <div>
+    <div class="container-fluid mt-3">
 
-        <!-- HEADER -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex justify-content-between mb-3">
             <h4>Data Siswa</h4>
             <div><?= $_SESSION['user']['nama']; ?></div>
         </div>
 
-        <!-- BUTTON -->
         <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#modalForm">
             + Tambah Siswa
         </button>
 
-        <!-- IMPORT -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <h5>Import Excel</h5>
-
-                <form method="POST" enctype="multipart/form-data" class="form-inline">
-                    <input type="file" name="file" class="form-control mr-2 mb-2" required>
-                    <button class="btn btn-success mr-2 mb-2" name="import_excel">Import</button>
-                    <a href="siswa.php?download_template=1" class="btn btn-info mb-2">Template</a>
-                </form>
-
-                <?php if(!$excel_ready): ?>
-                <div class="alert alert-danger mt-2">
-                    PhpSpreadsheet belum terinstall
-                </div>
-                <?php endif; ?>
-            </div>
-        </div>
-
-        <!-- TABLE -->
         <div class="card">
             <div class="card-body">
 
-                <h5>Daftar Siswa</h5>
-
-                <!-- SEARCH -->
-                <form method="GET" class="form-inline mb-3">
-                    <input type="text" name="search" class="form-control mr-2" placeholder="Cari siswa"
-                        value="<?= htmlspecialchars($search) ?>">
-                    <button class="btn btn-primary mr-2">Cari</button>
-
-                    <?php if($search): ?>
-                    <a href="siswa.php" class="btn btn-secondary">Reset</a>
-                    <?php endif; ?>
+                <form method="GET" class="mb-2">
+                    <input type="text" name="search" class="form-control d-inline w-25"
+                        value="<?= htmlspecialchars($search) ?>" placeholder="Cari...">
+                    <button class="btn btn-primary btn-sm">Cari</button>
                 </form>
 
-                <div class="table-responsive">
-                    <table class="table table-bordered table-striped">
-                        <thead class="thead-dark">
-                            <tr>
-                                <th>No</th>
-                                <th>NIS</th>
-                                <th>Nama</th>
-                                <th>Kelas</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+                <!-- IMPORT -->
+                <div class="card mb-3">
+                    <div class="card-body">
 
-                            <?php 
-                    $no = $start + 1;
-                    while($d=mysqli_fetch_array($q)){ 
-                    ?>
-                            <tr>
-                                <td><?= $no++ ?></td>
-                                <td><?= htmlspecialchars($d['nis']) ?></td>
-                                <td><?= htmlspecialchars($d['nama']) ?></td>
-                                <td><?= htmlspecialchars($d['nama_kelas']) ?></td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm" onclick="editData(
-                                    '<?= $d['id'] ?>',
-                                    '<?= htmlspecialchars($d['nis'],ENT_QUOTES) ?>',
-                                    '<?= htmlspecialchars($d['nama'],ENT_QUOTES) ?>',
-                                    '<?= $d['kelas_id'] ?>'
-                                )">Edit</button>
+                        <h5>Import Data Siswa</h5>
 
-                                    <a href="?hapus=<?= $d['id'] ?>" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Yakin?')">Hapus</a>
-                                </td>
-                            </tr>
-                            <?php } ?>
+                        <form method="POST" enctype="multipart/form-data" class="form-inline">
 
-                        </tbody>
-                    </table>
+                            <input type="file" name="file" class="form-control mr-2 mb-2" accept=".xlsx" required>
+
+                            <button type="submit" name="import_excel" class="btn btn-success mr-2 mb-2">
+                                Import Excel
+                            </button>
+
+                            <a href="siswa.php?download_template=1" class="btn btn-info mb-2">
+                                Download Template
+                            </a>
+
+                        </form>
+
+                        <?php if(!$excel_ready): ?>
+                        <div class="alert alert-danger mt-2">
+                            PhpSpreadsheet belum terinstall
+                        </div>
+                        <?php endif; ?>
+
+                    </div>
                 </div>
 
-                <!-- PAGINATION -->
+                <table class="table table-bordered table-striped">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>No</th>
+                            <th>NISN</th>
+                            <th>Nama</th>
+                            <th>Kelas</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <?php $no=$start+1; while($d=mysqli_fetch_array($q)){ ?>
+                        <tr>
+                            <td><?= $no++ ?></td>
+                            <td><?= $d['nisn'] ?></td>
+                            <td><?= $d['nama'] ?></td>
+                            <td><?= $d['nama_kelas'] ?></td>
+                            <td>
+                                <button class="btn btn-warning btn-sm" onclick="editData(
+'<?= $d['id'] ?>',
+'<?= $d['nisn'] ?>',
+'<?= $d['nama'] ?>',
+'<?= $d['kelas_id'] ?>'
+)">Edit</button>
+
+                                <a href="?hapus=<?= $d['id'] ?>" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Yakin?')">Hapus</a>
+                            </td>
+                        </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
+
                 <nav>
                     <ul class="pagination">
                         <?php for($i=1;$i<=$pages;$i++): ?>
@@ -187,7 +265,6 @@ $pages = ceil($total / $limit);
 
             </div>
         </div>
-
     </div>
 
     <!-- MODAL -->
@@ -198,7 +275,7 @@ $pages = ceil($total / $limit);
                 <form method="POST">
 
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalTitle">Tambah Siswa</h5>
+                        <h5 id="modalTitle">Tambah Siswa</h5>
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
 
@@ -206,39 +283,24 @@ $pages = ceil($total / $limit);
 
                         <input type="hidden" name="id" id="id">
 
-                        <div class="form-group">
-                            <label>NIS</label>
-                            <input type="text" name="nis" id="nis" class="form-control" required>
-                        </div>
+                        <input type="text" name="nisn" id="nisn" class="form-control mb-2" placeholder="NISN" required>
+                        <input type="text" name="nama" id="nama" class="form-control mb-2" placeholder="Nama" required>
 
-                        <div class="form-group">
-                            <label>Nama</label>
-                            <input type="text" name="nama" id="nama" class="form-control" required>
-                        </div>
-
-                        <!-- KELAS DINAMIS -->
-                        <div class="form-group">
-                            <label>Kelas</label>
-                            <select name="kelas_id" id="kelas_id" class="form-control" required>
-                                <option value="">-- Pilih Kelas --</option>
-                                <?php
-                            $kelas = mysqli_query($conn,"SELECT * FROM kelas");
-                            while($k = mysqli_fetch_array($kelas)){
-                                echo "<option value='$k[id]'>$k[nama_kelas]</option>";
-                            }
-                            ?>
-                            </select>
-                        </div>
+                        <select name="kelas_id" id="kelas_id" class="form-control" required>
+                            <option value="">-- Pilih Kelas --</option>
+                            <?php
+$k = mysqli_query($conn,"SELECT * FROM kelas");
+while($d=mysqli_fetch_array($k)){
+echo "<option value='$d[id]'>$d[nama_kelas]</option>";
+}
+?>
+                        </select>
 
                     </div>
 
                     <div class="modal-footer">
-                        <button type="submit" name="simpan" id="btnSubmit" class="btn btn-primary">
-                            Simpan
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                            Tutup
-                        </button>
+                        <button type="submit" name="simpan" id="btnSubmit" class="btn btn-primary">Simpan</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
                     </div>
 
                 </form>
@@ -247,102 +309,28 @@ $pages = ceil($total / $limit);
         </div>
     </div>
 
-    <?php include 'template_footer.php'; ?>
-
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-    function editData(id, nis, nama, kelas_id) {
+    function editData(id, nisn, nama, kelas) {
         $('#modalForm').modal('show');
 
         document.getElementById('modalTitle').innerText = 'Edit Siswa';
+
+        document.getElementById('id').value = id;
+        document.getElementById('nisn').value = nisn;
+        document.getElementById('nama').value = nama;
+        document.getElementById('kelas_id').value = kelas;
 
         let btn = document.getElementById('btnSubmit');
         btn.name = 'update';
         btn.classList.remove('btn-primary');
         btn.classList.add('btn-warning');
         btn.innerText = 'Update';
-
-        document.getElementById('id').value = id;
-        document.getElementById('nis').value = nis;
-        document.getElementById('nama').value = nama;
-        document.getElementById('kelas_id').value = kelas_id;
     }
     </script>
 
 </body>
 
 </html>
-
-<?php
-// ================= SIMPAN =================
-if(isset($_POST['simpan'])){
-$nis = mysqli_real_escape_string($conn,$_POST['nis']);
-$nama = mysqli_real_escape_string($conn,$_POST['nama']);
-$kelas_id = $_POST['kelas_id'];
-
-mysqli_query($conn,"INSERT INTO siswa (nis,nama,kelas_id)
-VALUES ('$nis','$nama','$kelas_id')");
-
-echo "<script>location='siswa.php';</script>";
-}
-
-// ================= UPDATE =================
-if(isset($_POST['update'])){
-mysqli_query($conn,"UPDATE siswa SET 
-nis='$_POST[nis]',
-nama='$_POST[nama]',
-kelas_id='$_POST[kelas_id]'
-WHERE id='$_POST[id]'");
-
-echo "<script>location='siswa.php';</script>";
-}
-
-// ================= HAPUS =================
-if(isset($_GET['hapus'])){
-mysqli_query($conn,"DELETE FROM siswa WHERE id='$_GET[hapus]'");
-echo "<script>location='siswa.php';</script>";
-}
-
-// ================= IMPORT =================
-if(isset($_POST['import_excel'])){
-    if(!$excel_ready){
-        echo "<script>alert('Library belum ada');</script>";
-        exit;
-    }
-
-    $file = $_FILES['file']['tmp_name'];
-    $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file);
-    $sheet = $spreadsheet->getActiveSheet()->toArray();
-
-    foreach($sheet as $i=>$row){
-        if($i==0) continue;
-
-        $nis   = mysqli_real_escape_string($conn,$row[0]);
-        $nama  = mysqli_real_escape_string($conn,$row[1]);
-        $kelas = mysqli_real_escape_string($conn,$row[2]);
-
-        if(empty($nis) || empty($kelas)) continue;
-
-        // cari kelas_id dari nama_kelas
-        $k = mysqli_fetch_assoc(mysqli_query($conn,"
-            SELECT id FROM kelas WHERE nama_kelas='$kelas'
-        "));
-
-        if(!$k){
-            // jika kelas tidak ditemukan, skip
-            continue;
-        }
-
-        $kelas_id = $k['id'];
-
-        mysqli_query($conn,"
-            INSERT INTO siswa (nis,nama,kelas_id)
-            VALUES ('$nis','$nama','$kelas_id')
-        ");
-    }
-
-    echo "<script>alert('Import berhasil');location='siswa.php';</script>";
-}
-?>

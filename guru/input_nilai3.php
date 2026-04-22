@@ -33,12 +33,13 @@ $start = ($page - 1) * $limit;
 
 // ================= QUERY DATA =================
 $q = mysqli_query($conn,"
-SELECT n.*, s.nama as nama_siswa, s.kelas, m.nama_mapel 
+SELECT n.*, s.nama as nama_siswa, k.nama_kelas as kelas, m.nama_mapel 
 FROM nilai n
 JOIN siswa s ON n.siswa_id = s.id
+JOIN kelas k ON s.kelas_id = k.id
 JOIN mapel m ON n.mapel_id = m.id
 WHERE n.mapel_id IN ($mapel_ids_str)
-AND s.kelas IN ($kelas_str)
+AND k.nama_kelas IN ($kelas_str)
 ".(!empty($search) ? " AND (s.nama LIKE '%$s%' OR m.nama_mapel LIKE '%$s%')" : "")."
 LIMIT $start,$limit
 ");
@@ -66,7 +67,7 @@ if(isset($_GET['download_template'])){
     $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
 
-    $sheet->setCellValue('A1','nis');
+    $sheet->setCellValue('A1','nisn');
     $sheet->setCellValue('B1','mapel');
     $sheet->setCellValue('C1','nilai');
     $sheet->setCellValue('D1','deskripsi');
@@ -77,6 +78,68 @@ if(isset($_GET['download_template'])){
     $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
     $writer->save('php://output');
     exit;
+}
+
+// ================= IMPORT =================
+if(isset($_POST['import_excel'])){
+
+    if(!$excel_ready){
+        echo "<script>alert('Library belum ada');</script>";
+        exit;
+    }
+
+    $file = $_FILES['file']['tmp_name'];
+    $sheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($file)->getActiveSheet()->toArray();
+
+    foreach($sheet as $i=>$row){
+        if($i==0) continue;
+
+        $nis   = mysqli_real_escape_string($conn,$row[0]);
+        $mapel = mysqli_real_escape_string($conn,$row[1]);
+        $nilai = mysqli_real_escape_string($conn,$row[2]);
+        $desk  = mysqli_real_escape_string($conn,$row[3]);
+
+        // ambil siswa
+        $s = mysqli_fetch_assoc(mysqli_query($conn,"
+            SELECT s.id, k.nama_kelas 
+            FROM siswa s
+            JOIN kelas k ON s.kelas_id=k.id
+            WHERE s.nisn='$nis'
+        "));
+
+        // ambil mapel
+        $m = mysqli_fetch_assoc(mysqli_query($conn,"
+            SELECT id FROM mapel WHERE nama_mapel='$mapel'
+        "));
+
+        if(!$s || !$m) continue;
+
+        // validasi mengajar
+        $cek = mysqli_query($conn,"
+            SELECT * FROM guru_mapel_kelas
+            WHERE guru_id='$guru_id'
+            AND mapel_id='{$m['id']}'
+            AND kelas='{$s['nama_kelas']}'
+        ");
+
+        if(mysqli_num_rows($cek)==0) continue;
+
+        mysqli_query($conn,"
+            INSERT INTO nilai 
+            (siswa_id,mapel_id,guru_id,semester,bulan,nilai,deskripsi)
+            VALUES(
+                '{$s['id']}',
+                '{$m['id']}',
+                '$guru_id',
+                'Ganjil',
+                'Januari',
+                '$nilai',
+                '$desk'
+            )
+        ");
+    }
+
+    echo "<script>alert('Import berhasil');location='input_nilai.php';</script>";
 }
 ?>
 
@@ -226,9 +289,14 @@ if(isset($_GET['download_template'])){
                             <select name="siswa_id" id="siswa_id" class="form-control" required>
                                 <option value="">-- Siswa --</option>
                                 <?php
-                            $siswa = mysqli_query($conn,"SELECT * FROM siswa WHERE kelas IN ($kelas_str)");
+                            $siswa = mysqli_query($conn,"SELECT * FROM siswa WHERE kelas IN ($kelas_str)");$siswa = mysqli_query($conn,"
+                            SELECT s.*, k.nama_kelas 
+                            FROM siswa s
+                            JOIN kelas k ON s.kelas_id = k.id
+                            WHERE k.nama_kelas IN ($kelas_str)
+                            ");
                             while($s=mysqli_fetch_array($siswa)){
-                                echo "<option value='$s[id]' data-kelas='$s[kelas]'>$s[nama]</option>";
+                                echo "<option value='$s[id]' data-kelas='$s[nama_kelas]'>$s[nama]</option>";
                             }
                             ?>
                             </select>
@@ -365,7 +433,10 @@ SELECT * FROM guru_mapel_kelas
 WHERE guru_id='$guru_id'
 AND mapel_id='$_POST[mapel_id]'
 AND kelas = (
-SELECT kelas FROM siswa WHERE id='$_POST[siswa_id]'
+SELECT k.nama_kelas 
+FROM siswa s 
+JOIN kelas k ON s.kelas_id = k.id
+WHERE s.id='$_POST[siswa_id]'
 )");
 
 if(mysqli_num_rows($cek)==0){
