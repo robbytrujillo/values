@@ -150,7 +150,7 @@ if(isset($_SESSION['user'])){
 
         <!-- HERO -->
         <section class="hero container">
-            <h1 data-aos="fade-up">Sistem Analisa Nilai SMA</h1>
+            <h1 data-aos="fade-up">Sistem Analisa Nilai Siswa</h1>
 
             <p class="text-muted mt-3" data-aos="fade-up" data-aos-delay="100">
                 Kelola nilai siswa, ranking, dan raport secara otomatis & modern

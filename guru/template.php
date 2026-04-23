@@ -48,7 +48,7 @@
 
             <!-- SIDEBAR -->
             <nav class="col-md-2 d-none d-md-block sidebar">
-                <h5 class="text-center mt-3">📊 Admin</h5>
+                <h5 class="text-center mt-3">📊 Guru</h5>
 
                 <a href="dashboard.php">Dashboard</a>
                 <a class="nav-link text-white" href="input_nilai.php">
