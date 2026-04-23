@@ -44,7 +44,7 @@ if(mysqli_num_rows($q)){
         $_SESSION['user'] = $user;
         $_SESSION['role'] = 'siswa';
 
-        header("Location: ../siswa/index.php");
+        header("Location: ../siswa/dashboard.php");
         exit;
     }
 }

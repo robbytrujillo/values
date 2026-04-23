@@ -124,6 +124,39 @@ if(isset($_POST['import_excel'])){
 
     echo "<script>alert('Import: $berhasil berhasil, $gagal gagal');location='input_nilai.php';</script>";
 }
+
+/* ======================
+   HARI INDO
+====================== */
+function hariIndonesia($tanggal) {
+    $hari = date('l', strtotime($tanggal));
+
+    $hariIndo = [
+        'Sunday'    => 'Minggu',
+        'Monday'    => 'Senin',
+        'Tuesday'   => 'Selasa',
+        'Wednesday' => 'Rabu',
+        'Thursday'  => 'Kamis',
+        'Friday'    => 'Jumat',
+        'Saturday'  => 'Sabtu'
+    ];
+
+    return $hariIndo[$hari];
+}
+
+function tanggalIndonesia($tanggal) {
+
+    $bulan = [
+        1 => 'Januari','Februari','Maret','April','Mei','Juni',
+        'Juli','Agustus','September','Oktober','November','Desember'
+    ];
+
+    $tanggalExplode = explode('-', date('Y-m-d', strtotime($tanggal)));
+
+    return $tanggalExplode[2] . ' ' .
+           $bulan[(int)$tanggalExplode[1]] . ' ' .
+           $tanggalExplode[0];
+}
 ?>
 
 <!DOCTYPE html>
@@ -166,16 +199,16 @@ if(isset($_POST['import_excel'])){
                         <option value="semester" <?= $filter_jenis=='semester'?'selected':'' ?>>Semester</option>
                     </select>
 
-                    <button class="btn btn-primary btn-sm mr-2">Filter</button>
-                    <a href="input_nilai.php" class="btn btn-outline-secondary btn-sm">Reset</a>
+                    <button class="btn btn-primary btn-sm mr-2 rounded-pill">Filter</button>
+                    <a href="input_nilai.php" class="btn btn-outline-secondary btn-sm rounded-pill">Reset</a>
 
                 </form>
             </div>
         </div>
 
         <!-- BUTTON -->
-        <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#modalForm">
-            + Input Nilai
+        <button class="btn btn-primary mb-3 rounded-pill" data-toggle="modal" data-target="#modalForm">
+            Input Nilai
         </button>
 
         <!-- IMPORT -->
@@ -183,8 +216,8 @@ if(isset($_POST['import_excel'])){
             <div class="card-body">
                 <form method="POST" enctype="multipart/form-data" class="form-inline">
                     <input type="file" name="file" class="form-control mr-2" required>
-                    <button class="btn btn-success mr-2" name="import_excel">Import</button>
-                    <a href="?download_template=1" class="btn btn-info">Template</a>
+                    <button class="btn btn-success mr-2 rounded-pill" name="import_excel">Import</button>
+                    <a href="?download_template=1" class="btn btn-info rounded-pill">Template</a>
                 </form>
             </div>
         </div>
@@ -197,7 +230,7 @@ if(isset($_POST['import_excel'])){
                     <thead class="thead-dark">
                         <tr>
                             <th>No</th>
-                            <th>Tanggal</th>
+                            <th>Waktu</th>
                             <th>Siswa</th>
                             <th>Kelas</th>
                             <th>Mapel</th>
@@ -211,7 +244,11 @@ if(isset($_POST['import_excel'])){
                         <?php $no=1; while($d=mysqli_fetch_assoc($q)){ ?>
                         <tr>
                             <td><?= $no++ ?></td>
-                            <td><?= $d['tanggal'] ?></td>
+                            <!-- <td><?= $d['tanggal'] ?></td> -->
+                            <td>
+                                <?= hariIndonesia($d['tanggal']); ?>,
+                                <?= tanggalIndonesia($d['tanggal']); ?>
+                            </td>
                             <td><?= $d['nama_siswa'] ?></td>
                             <td><?= $d['nama_kelas'] ?></td>
                             <td><?= $d['nama_mapel'] ?></td>
@@ -225,17 +262,18 @@ if(isset($_POST['import_excel'])){
                                 </span>
                             </td>
                             <td>
-                                <button class="btn btn-warning btn-sm" onclick="editData(
-            '<?= $d['id'] ?>',
-            '<?= $d['nilai'] ?>',
-            '<?= $d['jenis'] ?>',
-            '<?= $d['tanggal'] ?>',
-            '<?= htmlspecialchars($d['deskripsi'],ENT_QUOTES) ?>'
-        )">
+                                <button class="btn btn-warning btn-sm rounded-pill" onclick="editData(
+                                    '<?= $d['id'] ?>',
+                                    '<?= $d['nilai'] ?>',
+                                    '<?= $d['jenis'] ?>',
+                                    '<?= $d['tanggal'] ?>',
+                                    '<?= htmlspecialchars($d['deskripsi'],ENT_QUOTES) ?>'
+                                )">
                                     Edit
                                 </button>
 
-                                <button class="btn btn-danger btn-sm" onclick="hapusData('<?= $d['id'] ?>')">
+                                <button class="btn btn-danger btn-sm rounded-pill"
+                                    onclick="hapusData('<?= $d['id'] ?>')">
                                     Hapus
                                 </button>
                             </td>
@@ -341,6 +379,14 @@ if(isset($_POST['import_excel'])){
         </div>
     </div>
 
+    <div class="card mt-3">
+        <div class="card-body">
+            <canvas id="chartNilai" style="height:300px;"></canvas>
+        </div>
+    </div>
+
+    <?php include 'template_footer.php'; ?>
+
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -378,6 +424,70 @@ if(isset($_POST['import_excel'])){
     <script>
     $(document).ready(function() {
         $('#tableNilai').DataTable();
+    });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+    let chart;
+
+    function loadChart(jenis = '') {
+
+        $.ajax({
+            url: 'ajax_nilai.php',
+            method: 'GET',
+            data: {
+                jenis: jenis
+            },
+            dataType: 'json',
+            success: function(data) {
+
+                let labels = [];
+                let nilai = [];
+
+                data.forEach(d => {
+                    labels.push(d.nama_siswa);
+                    nilai.push(d.nilai);
+                });
+
+                let ctx = document.getElementById('chartNilai').getContext('2d');
+
+                if (chart) {
+                    chart.destroy();
+                }
+
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Nilai Siswa',
+                            data: nilai
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            },
+            error: function(xhr) {
+                console.log("ERROR AJAX:", xhr.responseText);
+            }
+        });
+    }
+
+    // LOAD AWAL
+    $(document).ready(function() {
+        loadChart("<?= $filter_jenis ?>");
+    });
+    </script>
+
+    <script>
+    $('form').submit(function() {
+        let jenis = $('[name=filter_jenis]').val();
+        loadChart(jenis);
     });
     </script>
 
