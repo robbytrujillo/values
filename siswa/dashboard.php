@@ -18,16 +18,53 @@ WHERE n.siswa_id='$siswa_id'
 ORDER BY n.tanggal DESC
 ");
 
+if(!$q){
+    die("Query nilai error: " . mysqli_error($conn));
+}
+
+/* ================= DATA SISWA + KELAS ================= */
+$sql_siswa = "
+SELECT s.*, k.nama_kelas
+FROM siswa s
+LEFT JOIN kelas k ON s.kelas_id = k.id
+WHERE s.id='$siswa_id'
+";
+
+$q_siswa = mysqli_query($conn, $sql_siswa);
+
+if(!$q_siswa){
+    die("Query siswa error: " . mysqli_error($conn));
+}
+
+$siswa = mysqli_fetch_assoc($q_siswa);
+
 /* ================= RANKING ================= */
 function getRanking($conn, $siswa_id, $jenis){
 
-    $rank = mysqli_query($conn,"
-    SELECT siswa_id, SUM(nilai) as total
-    FROM nilai
-    WHERE jenis='$jenis'
-    GROUP BY siswa_id
+    // ambil kelas siswa
+    $q = mysqli_query($conn,"SELECT kelas_id FROM siswa WHERE id='$siswa_id'");
+    if(!$q){
+        die(mysqli_error($conn));
+    }
+
+    $s = mysqli_fetch_assoc($q);
+    $kelas_id = $s['kelas_id'];
+
+    $sql = "
+    SELECT n.siswa_id, SUM(n.nilai) as total
+    FROM nilai n
+    JOIN siswa s ON n.siswa_id = s.id
+    WHERE n.jenis='$jenis'
+    AND s.kelas_id='$kelas_id'
+    GROUP BY n.siswa_id
     ORDER BY total DESC
-    ");
+    ";
+
+    $rank = mysqli_query($conn, $sql);
+
+    if(!$rank){
+        die("Query Ranking Error: " . mysqli_error($conn));
+    }
 
     $no = 1;
     while($r = mysqli_fetch_assoc($rank)){
@@ -36,11 +73,13 @@ function getRanking($conn, $siswa_id, $jenis){
         }
         $no++;
     }
+
     return '-';
 }
 
-$rank_harian   = getRanking($conn,$siswa_id,'harian');
-$rank_bulanan  = getRanking($conn,$siswa_id,'bulanan');
+/* ================= HITUNG RANKING ================= */
+$rank_harian = getRanking($conn,$siswa_id,'harian');
+$rank_bulanan = getRanking($conn,$siswa_id,'bulanan');
 $rank_semester = getRanking($conn,$siswa_id,'semester');
 ?>
 
@@ -165,9 +204,9 @@ $rank_semester = getRanking($conn,$siswa_id,'semester');
                     🌙
                 </button>
 
-                <a href="auth/login.php" class="btn btn-primary btn-sm btn-main">
+                <!-- <a href="auth/login.php" class="btn btn-primary btn-sm btn-main">
                     Login
-                </a>
+                </a> -->
             </div>
         </div>
     </nav>
@@ -176,7 +215,9 @@ $rank_semester = getRanking($conn,$siswa_id,'semester');
 
         <h4>Dashboard Siswa</h4>
         <p>Nama: <strong><?= $_SESSION['user']['nama']; ?></strong></p>
-        <p>Kelas: <strong><?= $_SESSION['kelas']['nama_kelas']; ?></strong></p>
+        <!-- <p>Kelas: <strong><?= $_SESSION['kelas']['nama_kelas']; ?></strong></p> -->
+        <!-- <p>Nama: <strong><?= $siswa['nama']; ?></strong></p> -->
+        <p>Kelas: <strong><?= $siswa['nama_kelas']; ?></strong></p>
 
         <!-- RANKING -->
         <div class="row text-center mb-4">
@@ -279,6 +320,48 @@ $rank_semester = getRanking($conn,$siswa_id,'semester');
             });
 
         });
+    </script>
+
+    <!-- JS -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- AOS -->
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+
+    <script>
+    AOS.init({
+        duration: 800,
+        once: true
+    });
+
+    /* TOGGLE DARK MODE */
+    function toggleDark() {
+        document.body.classList.toggle('dark');
+
+        let btn = document.getElementById('themeToggle');
+
+        if (document.body.classList.contains('dark')) {
+            localStorage.setItem('theme', 'dark');
+            btn.innerHTML = '☀️';
+        } else {
+            localStorage.setItem('theme', 'light');
+            btn.innerHTML = '🌙';
+        }
+    }
+
+    /* LOAD THEME */
+    window.onload = function() {
+        let theme = localStorage.getItem('theme');
+        let btn = document.getElementById('themeToggle');
+
+        if (theme === 'dark') {
+            document.body.classList.add('dark');
+            btn.innerHTML = '☀️';
+        } else {
+            btn.innerHTML = '🌙';
+        }
+    }
     </script>
 
 </body>

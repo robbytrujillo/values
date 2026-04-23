@@ -165,6 +165,8 @@ function tanggalIndonesia($tanggal) {
 <head>
     <title>Input Nilai</title>
 
+    <link rel="icon" type="image/png" href="../assets/images/logo-sma.png">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
 
