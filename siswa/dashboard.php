@@ -9,6 +9,41 @@ if($_SESSION['role'] != 'siswa'){
 
 $siswa_id = $_SESSION['user']['id'];
 
+/* ================= STATISTIK ================= */
+
+// rata-rata nilai siswa
+$q_avg = mysqli_fetch_assoc(mysqli_query($conn,"
+SELECT AVG(nilai) as rata 
+FROM nilai 
+WHERE siswa_id='$siswa_id'
+"));
+$rata_siswa = round($q_avg['rata'],2);
+
+// nilai tertinggi
+$q_max = mysqli_fetch_assoc(mysqli_query($conn,"
+SELECT MAX(nilai) as max 
+FROM nilai 
+WHERE siswa_id='$siswa_id'
+"));
+$max_siswa = $q_max['max'] ?? 0;
+
+// nilai terendah
+$q_min = mysqli_fetch_assoc(mysqli_query($conn,"
+SELECT MIN(nilai) as min 
+FROM nilai 
+WHERE siswa_id='$siswa_id'
+"));
+$min_siswa = $q_min['min'] ?? 0;
+
+// total nilai
+$q_sum = mysqli_fetch_assoc(mysqli_query($conn,"
+SELECT SUM(nilai) as total 
+FROM nilai 
+WHERE siswa_id='$siswa_id'
+"));
+$total_siswa = $q_sum['total'] ?? 0;
+
+
 /* ================= DATA NILAI ================= */
 $q = mysqli_query($conn,"
 SELECT n.*, m.nama_mapel
@@ -251,6 +286,48 @@ $rank_semester = getRanking($conn,$siswa_id,'semester');
                 </div>
             </div>
         </div>
+        <br>
+
+        <!-- STATISTIK SISWA -->
+        <div class="row text-center mb-4">
+
+            <div class="col-md-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        Rata-rata
+                        <h4><?= $rata_siswa ?></h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        Nilai Tertinggi
+                        <h4><?= $max_siswa ?></h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body">
+                        Nilai Terendah
+                        <h4><?= $min_siswa ?></h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card bg-dark text-white">
+                    <div class="card-body">
+                        Total Nilai
+                        <h4><?= $total_siswa ?></h4>
+                    </div>
+                </div>
+            </div>
+
+        </div>
 
         <br>
         <!-- RANKING -->
@@ -287,6 +364,17 @@ $rank_semester = getRanking($conn,$siswa_id,'semester');
         <div class="card mb-4">
             <div class="card-body">
                 <canvas id="chartNilai"></canvas>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-body">
+                <h6>Progress Nilai</h6>
+                <div class="progress">
+                    <div class="progress-bar bg-success" style="width: <?= $rata_siswa ?>%">
+                        <?= $rata_siswa ?>%
+                    </div>
+                </div>
             </div>
         </div>
 

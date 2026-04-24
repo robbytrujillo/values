@@ -30,7 +30,7 @@ if(mysqli_num_rows($q)){
         $_SESSION['user'] = $user;
         $_SESSION['role'] = 'guru';
 
-        header("Location: ../guru/input_nilai.php");
+        header("Location: ../guru/dashboard.php");
         exit;
     }
 }
