@@ -214,15 +214,22 @@ $rank_semester = getRanking($conn,$siswa_id,'semester');
     <div class="container mt-4">
 
         <h4>Dashboard Siswa</h4>
-        <p>Nama: <strong><?= $_SESSION['user']['nama']; ?></strong></p>
-        <!-- <p>Kelas: <strong><?= $_SESSION['kelas']['nama_kelas']; ?></strong></p> -->
-        <!-- <p>Nama: <strong><?= $siswa['nama']; ?></strong></p> -->
-        <p>Kelas: <strong><?= $siswa['nama_kelas']; ?></strong></p>
+        <div class="card">
+            <div class="col-md-4">
+                <div class="body">
+                    <p>Nama: <strong><?= $_SESSION['user']['nama']; ?></strong></p>
+                    <!-- <p>Kelas: <strong><?= $_SESSION['kelas']['nama_kelas']; ?></strong></p> -->
+                    <!-- <p>Nama: <strong><?= $siswa['nama']; ?></strong></p> -->
+                    <p>Kelas: <strong><?= $siswa['nama_kelas']; ?></strong></p>
+                </div>
+            </div>
+        </div>
 
+        <br>
         <!-- RANKING -->
         <div class="row text-center mb-4">
-            <div class="col-md-4">
-                <div class="card bg-info text-white">
+            <div class="col-md-4 ">
+                <div class="card bg-info text-white" style="border-radius: 10px;">
                     <div class="card-body">
                         Ranking Harian
                         <h3><?= $rank_harian ?></h3>
@@ -231,7 +238,7 @@ $rank_semester = getRanking($conn,$siswa_id,'semester');
             </div>
 
             <div class="col-md-4">
-                <div class="card bg-warning text-white">
+                <div class="card bg-warning text-white" style="border-radius: 10px;">
                     <div class="card-body">
                         Ranking Bulanan
                         <h3><?= $rank_bulanan ?></h3>
@@ -240,7 +247,7 @@ $rank_semester = getRanking($conn,$siswa_id,'semester');
             </div>
 
             <div class="col-md-4">
-                <div class="card bg-success text-white">
+                <div class="card bg-success text-white" style="border-radius: 10px;">
                     <div class="card-body">
                         Ranking Semester
                         <h3><?= $rank_semester ?></h3>
@@ -282,9 +289,12 @@ $rank_semester = getRanking($conn,$siswa_id,'semester');
                 <!-- <a href="print_raport.php" target="_blank" class="btn btn-primary">
                     Print Raport
                 </a> -->
-                <a href="print_raport.php?jenis=harian" target="_blank" class="btn btn-info">Print Harian</a>
-                <a href="print_raport.php?jenis=bulanan" target="_blank" class="btn btn-warning">Print Bulanan</a>
-                <a href="print_raport.php?jenis=semester" target="_blank" class="btn btn-success">Print Semester</a>
+                <a href="print_raport.php?jenis=harian" target="_blank" class="btn btn-info rounded-pill">Print
+                    Harian</a>
+                <a href="print_raport.php?jenis=bulanan" target="_blank" class="btn btn-warning rounded-pill">Print
+                    Bulanan</a>
+                <a href="print_raport.php?jenis=semester" target="_blank" class="btn btn-success rounded-pill">Print
+                    Semester</a>
 
             </div>
         </div>
