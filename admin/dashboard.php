@@ -46,6 +46,9 @@ while($d = mysqli_fetch_assoc($data_mapel)){
 
 <div class="container-fluid mt-4">
 
+    <h4><strong style="font-weight: bold">Dashboard Admin</strong></h4>
+    <br>
+
     <!-- FILTER -->
     <form method="GET" class="form-inline mb-3">
         <select name="jenis" class="form-control mr-2">
