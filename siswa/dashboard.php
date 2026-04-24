@@ -188,6 +188,32 @@ $rank_semester = getRanking($conn,$siswa_id,'semester');
         color: #007bff !important;
         /* paksa tetap biru saat dark */
     }
+
+    /* TABLE DARK MODE */
+    body.dark table {
+        color: #fff !important;
+    }
+
+    body.dark table th,
+    body.dark table td {
+        color: #fff !important;
+    }
+
+    /* header table */
+    body.dark table thead {
+        background: #1e293b;
+    }
+
+    /* border table */
+    body.dark table,
+    body.dark table th,
+    body.dark table td {
+        border-color: #444 !important;
+    }
+
+    body.dark table tbody tr:hover {
+        background: #334155;
+    }
     </style>
 </head>
 
@@ -213,10 +239,11 @@ $rank_semester = getRanking($conn,$siswa_id,'semester');
 
     <div class="container mt-4">
 
-        <h4>Dashboard Siswa</h4>
+        <h4><strong style="font-weight: bold">Dashboard Siswa</strong></h4>
         <div class="card">
             <div class="col-md-4">
                 <div class="body">
+                    <br>
                     <p>Nama: <strong><?= $_SESSION['user']['nama']; ?></strong></p>
                     <!-- <p>Kelas: <strong><?= $_SESSION['kelas']['nama_kelas']; ?></strong></p> -->
                     <!-- <p>Nama: <strong><?= $siswa['nama']; ?></strong></p> -->
