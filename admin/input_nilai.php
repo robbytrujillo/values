@@ -4,11 +4,90 @@ include '../config/auth.php';
 cek_role(['admin']);
 include '../config/koneksi.php';
 
+
+
+// ================= SIMPAN =================
+if(isset($_POST['simpan'])){
+
+    $siswa_id = $_POST['siswa_id'] ?? '';
+    $mapel_id = $_POST['mapel_id'] ?? '';
+    $nilai    = (int)($_POST['nilai'] ?? 0);
+    $jenis    = $_POST['jenis_nilai'] ?? '';
+    $tanggal  = $_POST['tanggal'] ?? '';
+    $desk     = mysqli_real_escape_string($conn, $_POST['deskripsi'] ?? '');
+
+    // VALIDASI
+    if(!$siswa_id || !$mapel_id || !$jenis || !$tanggal){
+        echo "<script>alert('Data belum lengkap');</script>";
+        return;
+    }
+
+    if($nilai < 0 || $nilai > 100){
+        echo "<script>alert('Nilai harus 0-100');</script>";
+        return;
+    }
+
+    // ambil guru default (misalnya guru pertama)
+    $getGuru = mysqli_fetch_assoc(mysqli_query($conn,"SELECT id FROM guru LIMIT 1"));
+    $guru_id = $getGuru['id'] ?? 1; // fallback kalau kosong
+
+    $query = mysqli_query($conn,"INSERT INTO nilai
+        (siswa_id,mapel_id,guru_id,nilai,jenis,tanggal,deskripsi)
+        VALUES(
+        '$siswa_id',
+        '$mapel_id',
+        '$guru_id',
+        '$nilai',
+        '$jenis',
+        '$tanggal',
+        '$desk'
+    )");
+
+    if($query){
+        echo "<script>
+            alert('Data berhasil disimpan');
+            location='input_nilai.php';
+        </script>";
+    }else{
+        echo "<script>alert('Gagal simpan: ".mysqli_error($conn)."');</script>";
+    }
+}
+
+    /* ================= UPDATE ================= */
+if(isset($_POST['update'])){
+
+    $id = $_POST['id'];
+    $nilai = $_POST['nilai'];
+    $jenis = $_POST['jenis'];
+    $tanggal = $_POST['tanggal'];
+    $desk = mysqli_real_escape_string($conn,$_POST['deskripsi']);
+
+    mysqli_query($conn,"UPDATE nilai SET
+        nilai='$nilai',
+        jenis='$jenis',
+        tanggal='$tanggal',
+        deskripsi='$desk'
+        WHERE id='$id'
+    ");
+
+    echo "<script>location='input_nilai.php';</script>";
+}
+
+/* ================= HAPUS ================= */
+if(isset($_GET['hapus'])){
+    $id = $_GET['hapus'];
+
+    mysqli_query($conn,"DELETE FROM nilai WHERE id='$id'");
+
+    echo "<script>location='input_nilai.php';</script>";
+}
+
+
 /* ================= CEK EXCEL ================= */
 $excel_ready = false;
 if(file_exists('../vendor/autoload.php')){
-    require '../vendor/autoload.php';
-    $excel_ready = true;
+require '../vendor/autoload.php';
+$excel_ready = true;
 }
 
 /* ================= FILTER ================= */
@@ -28,84 +107,89 @@ ORDER BY n.id DESC
 
 /* ================= TEMPLATE EXCEL ================= */
 if(isset($_GET['download_template'])){
-    if(!$excel_ready) die('PhpSpreadsheet belum terinstall');
+if(!$excel_ready) die('PhpSpreadsheet belum terinstall');
 
-    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
-    $sheet = $spreadsheet->getActiveSheet();
+$spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+$sheet = $spreadsheet->getActiveSheet();
 
-    $sheet->setCellValue('A1','nisn');
-    $sheet->setCellValue('B1','mapel');
-    $sheet->setCellValue('C1','nilai');
-    $sheet->setCellValue('D1','jenis');
-    $sheet->setCellValue('E1','tanggal');
-    $sheet->setCellValue('F1','deskripsi');
+$sheet->setCellValue('A1','nisn');
+$sheet->setCellValue('B1','mapel');
+$sheet->setCellValue('C1','nilai');
+$sheet->setCellValue('D1','jenis');
+$sheet->setCellValue('E1','tanggal');
+$sheet->setCellValue('F1','deskripsi');
 
-    // contoh
-    $sheet->setCellValue('A2','123456');
-    $sheet->setCellValue('B2','Matematika');
-    $sheet->setCellValue('C2','90');
-    $sheet->setCellValue('D2','harian');
-    $sheet->setCellValue('E2','2026-01-01');
-    $sheet->setCellValue('F2','Bagus');
+// contoh
+$sheet->setCellValue('A2','123456');
+$sheet->setCellValue('B2','Matematika');
+$sheet->setCellValue('C2','90');
+$sheet->setCellValue('D2','harian');
+$sheet->setCellValue('E2','2026-01-01');
+$sheet->setCellValue('F2','Bagus');
 
-    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    header('Content-Disposition: attachment; filename="template_nilai.xlsx"');
+header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+header('Content-Disposition: attachment; filename="template_nilai.xlsx"');
 
-    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-    $writer->save('php://output');
-    exit;
+$writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+$writer->save('php://output');
+exit;
 }
 
 /* ================= IMPORT ================= */
 if(isset($_POST['import_excel'])){
 
-    if(!$excel_ready){
-        echo "<script>alert('Install PhpSpreadsheet dulu');</script>";
-        exit;
-    }
-
-    $file = $_FILES['file']['tmp_name'];
-    $rows = \PhpOffice\PhpSpreadsheet\IOFactory::load($file)->getActiveSheet()->toArray();
-
-    $berhasil = 0;
-    $gagal = 0;
-
-    foreach($rows as $i=>$row){
-        if($i==0) continue;
-
-        $nisn  = mysqli_real_escape_string($conn,$row[0]);
-        $mapel = mysqli_real_escape_string($conn,$row[1]);
-        $nilai = (int)$row[2];
-        $jenis = strtolower(trim($row[3]));
-        $tgl   = $row[4];
-        $desk  = mysqli_real_escape_string($conn,$row[5]);
-
-        if(!$nisn || !$mapel){ $gagal++; continue; }
-        if($nilai < 0 || $nilai > 100){ $gagal++; continue; }
-
-        $s = mysqli_fetch_assoc(mysqli_query($conn,"SELECT id FROM siswa WHERE nisn='$nisn'"));
-        $m = mysqli_fetch_assoc(mysqli_query($conn,"SELECT id FROM mapel WHERE nama_mapel='$mapel'"));
-
-        if(!$s || !$m){ $gagal++; continue; }
-
-        mysqli_query($conn,"INSERT INTO nilai
-        (siswa_id,mapel_id,guru_id,nilai,jenis,tanggal,deskripsi)
-        VALUES(
-        '{$s['id']}',
-        '{$m['id']}',
-        '0',
-        '$nilai',
-        '$jenis',
-        '$tgl',
-        '$desk'
-        )");
-
-        $berhasil++;
-    }
-
-    echo "<script>alert('Import: $berhasil berhasil, $gagal gagal');location='input_nilai.php';</script>";
+if(!$excel_ready){
+echo "<script>
+alert('Install PhpSpreadsheet dulu');
+</script>";
+exit;
 }
-?>
+
+$file = $_FILES['file']['tmp_name'];
+$rows = \PhpOffice\PhpSpreadsheet\IOFactory::load($file)->getActiveSheet()->toArray();
+
+$berhasil = 0;
+$gagal = 0;
+
+foreach($rows as $i=>$row){
+if($i==0) continue;
+
+$nisn = mysqli_real_escape_string($conn,$row[0]);
+$mapel = mysqli_real_escape_string($conn,$row[1]);
+$nilai = (int)$row[2];
+$jenis = strtolower(trim($row[3]));
+$tgl = $row[4];
+$desk = mysqli_real_escape_string($conn,$row[5]);
+
+if(!$nisn || !$mapel){ $gagal++; continue; }
+if($nilai < 0 || $nilai> 100){ $gagal++; continue; }
+
+    $s = mysqli_fetch_assoc(mysqli_query($conn,"SELECT id FROM siswa WHERE nisn='$nisn'"));
+    $m = mysqli_fetch_assoc(mysqli_query($conn,"SELECT id FROM mapel WHERE nama_mapel='$mapel'"));
+
+    if(!$s || !$m){ $gagal++; continue; }
+
+    mysqli_query($conn,"INSERT INTO nilai
+    (siswa_id,mapel_id,guru_id,nilai,jenis,tanggal,deskripsi)
+    VALUES(
+    '{$s['id']}',
+    '{$m['id']}',
+    '0',
+    '$nilai',
+    '$jenis',
+    '$tgl',
+    '$desk'
+    )");
+
+    $berhasil++;
+    }
+
+    echo "<script>
+    alert('Import: $berhasil berhasil, $gagal gagal');
+    location = 'input_nilai.php';
+    </script>";
+    }
+    ?>
 
 <!DOCTYPE html>
 <html>
@@ -133,7 +217,7 @@ if(isset($_POST['import_excel'])){
                 <option value="bulanan">Bulanan</option>
                 <option value="semester">Semester</option>
             </select>
-            <button class="btn btn-primary btn-sm">Filter</button>
+            <button class="btn btn-primary btn-sm rounded-pill">Filter</button>
         </form>
 
         <!-- IMPORT -->
@@ -141,8 +225,8 @@ if(isset($_POST['import_excel'])){
             <div class="card-body">
                 <form method="POST" enctype="multipart/form-data" class="form-inline">
                     <input type="file" name="file" class="form-control mr-2" required>
-                    <button class="btn btn-success mr-2" name="import_excel">Import</button>
-                    <a href="?download_template=1" class="btn btn-info">Template</a>
+                    <button class="btn btn-success mr-2 rounded-pill" name="import_excel">Import</button>
+                    <a href="?download_template=1" class="btn btn-info rounded-pill">Template</a>
                 </form>
 
                 <?php if(!$excel_ready): ?>
@@ -153,7 +237,7 @@ if(isset($_POST['import_excel'])){
             </div>
         </div>
 
-        <button class="btn btn-primary mb-3" data-toggle="modal" data-target="#modalTambah">
+        <button class="btn btn-primary mb-3 rounded-pill" data-toggle="modal" data-target="#modalTambah">
             Input Nilai
         </button>
 
@@ -181,7 +265,7 @@ if(isset($_POST['import_excel'])){
                     <td><?= $d['nilai'] ?></td>
                     <td><?= ucfirst($d['jenis']) ?></td>
                     <td>
-                        <button class="btn btn-warning btn-sm" onclick="editData(
+                        <button class="btn btn-warning btn-sm rounded-pill" onclick="editData(
             '<?= $d['id'] ?>',
             '<?= $d['nilai'] ?>',
             '<?= $d['jenis'] ?>',
@@ -191,7 +275,7 @@ if(isset($_POST['import_excel'])){
                             Edit
                         </button>
 
-                        <button class="btn btn-danger btn-sm" onclick="hapusData('<?= $d['id'] ?>')">
+                        <button class="btn btn-danger btn-sm rounded-pill" onclick="hapusData('<?= $d['id'] ?>')">
                             Hapus
                         </button>
                     </td>
@@ -207,7 +291,7 @@ if(isset($_POST['import_excel'])){
         <div class="modal-dialog">
             <div class="modal-content">
 
-                <form method="POST">
+                <form method="POST" action="">
                     <div class="modal-body">
 
                         <!-- SISWA -->
@@ -265,7 +349,7 @@ if(isset($_POST['import_excel'])){
         <div class="modal-dialog">
             <div class="modal-content">
 
-                <form method="POST">
+                <form method="POST" action="">
                     <div class="modal-body">
 
                         <input type="hidden" name="id" id="edit_id">
@@ -309,71 +393,24 @@ if(isset($_POST['import_excel'])){
     });
     </script>
 
+    <script>
+    function editData(id, nilai, jenis, tanggal, deskripsi) {
+        $('#modalEdit').modal('show');
+
+        $('#edit_id').val(id);
+        $('#edit_nilai').val(nilai);
+        $('#edit_jenis').val(jenis);
+        $('#edit_tanggal').val(tanggal);
+        $('#edit_deskripsi').val(deskripsi);
+    }
+
+    function hapusData(id) {
+        if (confirm('Yakin hapus data?')) {
+            window.location = 'input_nilai.php?hapus=' + id;
+        }
+    }
+    </script>
+
 </body>
 
 </html>
-
-<?php
-// Simpan
-if(isset($_POST['simpan'])){
-
-$siswa_id = $_POST['siswa_id'];
-$mapel_id = $_POST['mapel_id'];
-$nilai = (int)$_POST['nilai'];
-$jenis = $_POST['jenis_nilai'];
-$tanggal = $_POST['tanggal'];
-$desk = mysqli_real_escape_string($conn,$_POST['deskripsi']);
-
-if($nilai < 0 || $nilai> 100){
-    echo "<script>
-    alert('Nilai harus 0-100');
-    </script>";
-    exit;
-    }
-
-    mysqli_query($conn,"INSERT INTO nilai
-    (siswa_id,mapel_id,guru_id,nilai,jenis,tanggal,deskripsi)
-    VALUES(
-    '$siswa_id',
-    '$mapel_id',
-    '0',
-    '$nilai',
-    '$jenis',
-    '$tanggal',
-    '$desk'
-    )");
-
-    echo "<script>
-    location = 'input_nilai.php';
-    </script>";
-    }
-
-    /* ================= UPDATE ================= */
-if(isset($_POST['update'])){
-
-    $id = $_POST['id'];
-    $nilai = $_POST['nilai'];
-    $jenis = $_POST['jenis'];
-    $tanggal = $_POST['tanggal'];
-    $desk = mysqli_real_escape_string($conn,$_POST['deskripsi']);
-
-    mysqli_query($conn,"UPDATE nilai SET
-        nilai='$nilai',
-        jenis='$jenis',
-        tanggal='$tanggal',
-        deskripsi='$desk'
-        WHERE id='$id'
-    ");
-
-    echo "<script>location='input_nilai.php';</script>";
-}
-
-/* ================= HAPUS ================= */
-if(isset($_GET['hapus'])){
-    $id = $_GET['hapus'];
-
-    mysqli_query($conn,"DELETE FROM nilai WHERE id='$id'");
-
-    echo "<script>location='input_nilai.php';</script>";
-}
-?>

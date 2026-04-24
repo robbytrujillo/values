@@ -2,6 +2,9 @@
 include '../config/auth.php';
 cek_role(['admin']);
 include '../config/koneksi.php';
+
+// 🔥 TAMBAHKAN INI
+$jenis = $_GET['jenis'] ?? '';
 ?>
 
 <!DOCTYPE html>
@@ -21,11 +24,28 @@ include '../config/koneksi.php';
 
     <div>
 
+
+
         <!-- HEADER -->
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4>Ranking Siswa (Sekolah)</h4>
             <div><?= $_SESSION['user']['nama']; ?></div>
         </div>
+
+        <form method="GET" class="form-inline mb-3">
+            <select name="jenis" class="form-control mr-2">
+                <option value="">Semua</option>
+                <option value="harian" <?= ($_GET['jenis'] ?? '')=='harian'?'selected':'' ?>>Harian</option>
+                <option value="bulanan" <?= ($_GET['jenis'] ?? '')=='bulanan'?'selected':'' ?>>Bulanan</option>
+                <option value="semester" <?= ($_GET['jenis'] ?? '')=='semester'?'selected':'' ?>>Semester</option>
+            </select>
+            <button class="btn btn-primary btn-sm">Filter</button>
+        </form>
+
+        <p>
+            Jenis:
+            <strong><?= $jenis ? ucfirst($jenis) : 'Semua' ?></strong>
+        </p>
 
         <!-- TABLE -->
         <div class="card">
@@ -45,11 +65,15 @@ include '../config/koneksi.php';
                         <tbody>
 
                             <?php
+                    // $jenis = $_GET['jenis'] ?? '';
+                    $where = ($jenis!='') ? "WHERE nilai.jenis='$jenis'" : "";
+
                     $q=mysqli_query($conn,"
                     SELECT siswa.nama,
                     SUM(nilai.nilai) as total
                     FROM nilai
                     JOIN siswa ON nilai.siswa_id=siswa.id
+                    $where
                     GROUP BY siswa.id
                     ORDER BY total DESC
                     ");
