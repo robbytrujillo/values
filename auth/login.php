@@ -58,16 +58,29 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary btn-block rounded-pill">
-                            Masuk
+                            LogIn
                         </button>
 
+                        <footer class="footer-full text-center mt-auto py-3 bg-light border-top">
+                            <div class="small" style="font-weight: bold">
+                                Copyright &copy; <?= date('Y'); ?>
+                                <a href="https://robbyilham.com/" target="_blank">by</a>
+                                IT Develop. IHBS
+                            </div>
+                        </footer>
                     </form>
 
                 </div>
+                <a href="../index.php" style="color: red; text-align: center;">
+                    ← Back
+                </a>
             </div>
 
         </div>
+
     </div>
+
+
 
     <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>

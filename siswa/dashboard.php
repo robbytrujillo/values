@@ -311,9 +311,9 @@ if(!$q_top){
                     🌙
                 </button>
 
-                <!-- <a href="auth/login.php" class="btn btn-primary btn-sm btn-main">
-                    Login
-                </a> -->
+                <a href="../auth/logout.php" class="btn btn-primary btn-sm btn-main">
+                    Logout
+                </a>
             </div>
         </div>
     </nav>
@@ -550,8 +550,10 @@ $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['na
 ?>
 
                     <!-- FOTO -->
-                    <img src="../assets/foto/<?= $t['foto'] ?? 'default.png' ?>" width="45" height="45"
-                        style="border-radius:50%; object-fit:cover;">
+                    <!-- <img src="../assets/foto/<?= $t['foto'] ?? 'default.png' ?>" width="45" height="45"
+                        style="border-radius:50%; object-fit:cover;"> -->
+
+                    <img src="<?= $avatar ?>" width="45" height="45" style="border-radius:50%;">
 
                     <!-- NAMA -->
                     <div class="ml-3 flex-grow-1">
@@ -575,6 +577,42 @@ $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['na
 
             </div>
         </div>
+
+        <div class="row mb-4">
+
+            <!-- ANALISA AI -->
+            <!-- <div class="col-md-6">
+                <div class="card shadow border-0" style="border-radius:15px;">
+                    <div class="card-body">
+                        <h5>🤖 Analisa AI</h5>
+                        <div id="aiInsight">Loading...</div>
+                    </div>
+                </div>
+            </div> -->
+
+            <!-- REKOMENDASI -->
+            <!-- <div class="col-md-6">
+                <div class="card shadow border-0" style="border-radius:15px;">
+                    <div class="card-body">
+                        <h5>📚 Rekomendasi Belajar</h5>
+                        <div id="aiRekomendasi">Loading...</div>
+                    </div>
+                </div>
+            </div> -->
+
+        </div>
+
+        <!-- CHAT -->
+        <!-- <div class="card shadow mb-4">
+            <div class="card-body">
+                <h5>💬 Tanya AI</h5>
+
+                <div id="chatBox" style="height:200px; overflow:auto; font-size:14px;"></div>
+
+                <input id="chatInput" class="form-control mt-2" placeholder="Tanya nilai kamu...">
+                <button onclick="kirimAI()" class="btn btn-primary mt-2 btn-sm">Kirim</button>
+            </div>
+        </div> -->
 
         <!-- CHART -->
         <div class="card mb-4">
@@ -814,6 +852,85 @@ $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['na
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
     <script>
     AOS.init();
+    </script>
+
+    <script>
+    /* ================= LOAD AI ================= */
+
+    // ANALISA
+    fetch('ai.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'mode=insight&siswa_id=<?= $siswa_id ?>'
+        })
+        .then(res => res.json())
+        .then(d => {
+            document.getElementById('aiInsight').innerHTML =
+                // d.choices[0].message.content;
+                d.response;
+        })
+        .catch(() => {
+            document.getElementById('aiInsight').innerHTML = "Gagal load AI";
+        });
+
+    // REKOMENDASI
+    fetch('ai.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'mode=rekomendasi&siswa_id=<?= $siswa_id ?>'
+        })
+        .then(res => res.json())
+        .then(d => {
+            document.getElementById('aiRekomendasi').innerHTML =
+                // d.choices[0].message.content;
+                d.response;
+        })
+        .catch(() => {
+            document.getElementById('aiRekomendasi').innerHTML = "Gagal load AI";
+        });
+
+
+    /* ================= CHATBOT ================= */
+
+    function kirimAI() {
+        let input = document.getElementById('chatInput');
+        let q = input.value;
+
+        if (!q) return;
+
+        document.getElementById('chatBox').innerHTML += `
+    <div><b>Kamu:</b> ${q}</div>
+    `;
+
+        fetch('ai.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `mode=chat&siswa_id=<?= $siswa_id ?>&question=${encodeURIComponent(q)}`
+            })
+            .then(res => res.json())
+            .then(d => {
+                // let jawab = d.choices[0].message.content;
+                let jawab = d.response;
+
+                document.getElementById('chatBox').innerHTML += `
+    <div><b>AI:</b> ${jawab}</div>
+    <hr>
+    `;
+
+                input.value = "";
+            })
+            .catch(() => {
+                document.getElementById('chatBox').innerHTML += `
+    <div style="color:red;">AI error</div>
+    `;
+            });
+    }
     </script>
 
 </body>
