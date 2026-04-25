@@ -135,23 +135,6 @@ GROUP BY s.id
 ORDER BY total DESC
 LIMIT 5
 ");
-
-/* ================= TOP 5 ================= */
-$kelas_id = $siswa['kelas_id'];
-
-$q_top = mysqli_query($conn,"
-SELECT s.nama, SUM(n.nilai) as total
-FROM nilai n
-JOIN siswa s ON n.siswa_id = s.id
-WHERE s.kelas_id='$kelas_id'
-GROUP BY s.id
-ORDER BY total DESC
-LIMIT 5
-");
-
-if(!$q_top){
-    die("Query TOP ERROR: ".mysqli_error($conn));
-}
 ?>
 
 <!DOCTYPE html>
@@ -543,11 +526,6 @@ if(!$q_top){
                     <div style="width:40px; font-weight:bold;">
                         <?= $no ?>
                     </div>
-
-                    <?php
-// generate avatar unik dari nama
-$avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['nama']);
-?>
 
                     <!-- FOTO -->
                     <img src="../assets/foto/<?= $t['foto'] ?? 'default.png' ?>" width="45" height="45"
