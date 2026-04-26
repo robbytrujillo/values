@@ -72,21 +72,69 @@ $rata = $jumlah ? round($total/$jumlah,2) : 0;
     .bold {
         font-weight: bold;
     }
+
+    body {
+        font-family: Arial;
+        font-size: 13px;
+    }
+
+    .header {
+        text-align: center;
+        line-height: 1.3;
+    }
+
+    .table {
+        width: 100%;
+        margin-top: 5px;
+    }
+
+    .table td {
+        padding: 4px;
+    }
+
+    .table-nilai {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    .table-nilai th {
+        background: #eee;
+        text-align: center;
+    }
+
+    .table-nilai td,
+    .table-nilai th {
+        border: 1px solid #000;
+        padding: 6px;
+    }
+
+    .judul {
+        font-weight: bold;
+        margin-top: 10px;
+    }
     </style>
 </head>
 
 <body onload="window.print()">
 
-    <div class="header">
+    <!-- <div class="header">
         <h3>YAYASAN DAKWAH ISLAM CAHAYA ILMU</h3>
         <h4>SMA BOARDING SCHOOL</h4>
         <p>LAPORAN <?= strtoupper($jenis) ?></p>
+    </div> -->
+
+    <div class="header">
+        <h3>YAYASAN DAKWAH ISLAM CAHAYA ILMU</h3>
+        <h4>SMA BOARDING SCHOOL</h4>
+        <h4><b>LAPORAN HASIL BELAJAR SISWA</b></h4>
+        <p>Periode: <?= ucfirst($jenis) ?></p>
     </div>
 
     <hr>
 
     <!-- BIODATA -->
-    <table class="table">
+    <!-- <table class="table">
         <tr>
             <td width="200">Nama Siswa</td>
             <td>: <?= $siswa['nama'] ?></td>
@@ -99,6 +147,21 @@ $rata = $jumlah ? round($total/$jumlah,2) : 0;
             <td>Jenis Nilai</td>
             <td>: <b><?= ucfirst($jenis) ?></b></td>
         </tr>
+    </table> -->
+
+    <table class="table">
+        <tr>
+            <td width="150">Nama</td>
+            <td>: <?= $siswa['nama'] ?></td>
+        </tr>
+        <tr>
+            <td>Kelas</td>
+            <td>: <?= $siswa['nama_kelas'] ?></td>
+        </tr>
+        <tr>
+            <td>Tanggal</td>
+            <td>: <?= date('d-m-Y') ?></td>
+        </tr>
     </table>
 
     <br>
@@ -110,13 +173,43 @@ $rata = $jumlah ? round($total/$jumlah,2) : 0;
 $no = 1;
 foreach($data_nilai as $d){
 ?>
-    <table class="table">
+    <!-- <table class="table">
         <tr>
             <td width="30"><?= $no++ ?></td>
             <td width="200"><?= $d['nama_mapel'] ?></td>
             <td width="50"><b><?= round($d['nilai']) ?></b></td>
             <td><?= $d['deskripsi'] ?: '-' ?></td>
         </tr>
+    </table> -->
+    <table class="table-nilai" border="1" cellspacing="0" cellpadding="5">
+        <tr>
+            <th>No</th>
+            <th>Mata Pelajaran</th>
+            <th>Nilai</th>
+            <th>Predikat</th>
+            <th>Deskripsi</th>
+        </tr>
+
+        <?php 
+    $no=1;
+    foreach($data_nilai as $d):
+
+        $nilai = round($d['nilai']);
+
+        // hitung predikat
+        if($nilai >= 92) $predikat = 'A';
+        elseif($nilai >= 83) $predikat = 'B';
+        elseif($nilai >= 76) $predikat = 'C';
+        else $predikat = 'D';
+    ?>
+        <tr>
+            <td align="center"><?= $no++ ?></td>
+            <td><?= $d['nama_mapel'] ?></td>
+            <td align="center"><?= $nilai ?></td>
+            <td align="center"><?= $predikat ?></td>
+            <td><?= $d['deskripsi'] ?: '-' ?></td>
+        </tr>
+        <?php endforeach; ?>
     </table>
     <?php } ?>
 
