@@ -1,11 +1,12 @@
 <?php
 session_start();
+require '../vendor/autoload.php';
 include '../config/koneksi.php';
 
-$siswa_id = $_SESSION['user']['id'];
+use Dompdf\Dompdf;
 
-/* ================= FILTER JENIS ================= */
-$jenis = $_GET['jenis'] ?? 'bulanan'; // default bulanan
+$siswa_id = $_SESSION['user']['id'];
+$jenis = $_GET['jenis'] ?? 'bulanan';
 
 /* ================= DATA SISWA ================= */
 $siswa = mysqli_fetch_assoc(mysqli_query($conn,"
@@ -25,248 +26,242 @@ AND n.jenis='$jenis'
 GROUP BY n.mapel_id
 ");
 
-/* ================= HITUNG RATA ================= */
-$total = 0;
-$jumlah = 0;
-$data_nilai = [];
+$total=0; $jumlah=0;
+$data_nilai=[];
 
-while($d = mysqli_fetch_assoc($q)){
+while($d=mysqli_fetch_assoc($q)){
     $total += $d['nilai'];
     $jumlah++;
     $data_nilai[] = $d;
 }
 
 $rata = $jumlah ? round($total/$jumlah,2) : 0;
+
+/* ================= HTML ================= */
+$logo_path = __DIR__ . '/../assets/images/ihbs-Logo.png';
+
+$type = pathinfo($logo_path, PATHINFO_EXTENSION);
+$data = file_get_contents($logo_path);
+
+$logo_base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+
+ob_start();
 ?>
 
-<!DOCTYPE html>
-<html>
+<style>
+@page {
+    margin: 25px;
+}
 
-<head>
-    <title>Raport</title>
-    <style>
-    body {
-        font-family: Arial;
-        font-size: 14px;
-    }
+body {
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+}
 
-    .header {
-        text-align: center;
-    }
+/* ================= HEADER ================= */
+.header {
+    width: 100%;
+    border-bottom: 3px solid #000;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
 
-    .judul {
-        font-weight: bold;
-        margin-top: 10px;
-    }
+.header table {
+    width: 100%;
+}
 
-    .table {
-        width: 100%;
-        margin-top: 10px;
-    }
+.logo {
+    width: 80px;
+}
 
-    .table td {
-        padding: 4px;
-        vertical-align: top;
-    }
+.text-header {
+    text-align: center;
+}
 
-    .bold {
-        font-weight: bold;
-    }
+.text-header h3,
+.text-header h4,
+.text-header p {
+    margin: 2px;
+}
 
-    body {
-        font-family: Arial;
-        font-size: 13px;
-    }
+/* ================= BIODATA ================= */
+.biodata {
+    margin-top: 10px;
+}
 
-    .header {
-        text-align: center;
-        line-height: 1.3;
-    }
+.biodata td {
+    padding: 3px;
+}
 
-    .table {
-        width: 100%;
-        margin-top: 5px;
-    }
+/* ================= TABLE NILAI ================= */
+.table-nilai {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
 
-    .table td {
-        padding: 4px;
-    }
+.table-nilai th,
+.table-nilai td {
+    border: 1px solid #000;
+    padding: 6px;
+}
 
-    .table-nilai {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-    }
+.table-nilai th {
+    background: #f2f2f2;
+    text-align: center;
+}
 
-    .table-nilai th {
-        background: #eee;
-        text-align: center;
-    }
+/* ================= FOOTER ================= */
+.ttd {
+    margin-top: 40px;
+}
 
-    .table-nilai td,
-    .table-nilai th {
-        border: 1px solid #000;
-        padding: 6px;
-    }
+.ttd td {
+    text-align: center;
+    padding-top: 40px;
+}
 
-    .judul {
-        font-weight: bold;
-        margin-top: 10px;
-    }
-    </style>
-</head>
+/* cap */
+.cap {
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    opacity: 0.15;
+}
+</style>
 
-<body onload="window.print()">
-
-    <!-- <div class="header">
-        <h3>YAYASAN DAKWAH ISLAM CAHAYA ILMU</h3>
-        <h4>SMA BOARDING SCHOOL</h4>
-        <p>LAPORAN <?= strtoupper($jenis) ?></p>
-    </div> -->
-
-    <div class="header">
-        <h3>YAYASAN DAKWAH ISLAM CAHAYA ILMU</h3>
-        <h4>SMA BOARDING SCHOOL</h4>
+<!-- ================= HEADER ================= -->
+<div class="header">
+    <table>
+        <tr>
+            <td width="90">
+                <!-- <img src="../assets/images/logo-sma.png" class="logo"> -->
+                <img src="<?= $logo_base64 ?>" width="80">
+            </td>
+            <td class="text-header">
+                <h2>YAYASAN DAKWAH ISLAM CAHAYA ILMU</h3>
+                    <h3>SMA BOARDING SCHOOL</h3>
+                    <h4><b>LAPORAN HASIL BELAJAR SISWA</b></h4>
+                    <p>Periode: <?= strtoupper($jenis) ?></p>
+            </td>
+        </tr>
+    </table>
+</div>
+<!-- <div>
+    <tr style="text-align: center">
         <h4><b>LAPORAN HASIL BELAJAR SISWA</b></h4>
-        <p>Periode: <?= ucfirst($jenis) ?></p>
-    </div>
+        <p>Periode: <?= strtoupper($jenis) ?></p>
+    </tr>
+</div> -->
 
-    <hr>
 
-    <!-- BIODATA -->
-    <!-- <table class="table">
-        <tr>
-            <td width="200">Nama Siswa</td>
-            <td>: <?= $siswa['nama'] ?></td>
-        </tr>
-        <tr>
-            <td>Kelas</td>
-            <td>: <?= $siswa['nama_kelas'] ?></td>
-        </tr>
-        <tr>
-            <td>Jenis Nilai</td>
-            <td>: <b><?= ucfirst($jenis) ?></b></td>
-        </tr>
-    </table> -->
+<!-- ================= BIODATA ================= -->
+<table class="biodata">
 
-    <table class="table">
-        <tr>
-            <td width="150">Nama</td>
-            <td>: <?= $siswa['nama'] ?></td>
-        </tr>
-        <tr>
-            <td>Kelas</td>
-            <td>: <?= $siswa['nama_kelas'] ?></td>
-        </tr>
-        <tr>
-            <td>Tanggal</td>
-            <td>: <?= date('d-m-Y') ?></td>
-        </tr>
-    </table>
 
-    <br>
+    <tr>
+        <td width="50">Nama</td>
+        <td>: <?= $siswa['nama'] ?></td>
+    </tr>
+    <tr>
+        <td>Kelas</td>
+        <td>: <?= $siswa['nama_kelas'] ?></td>
+    </tr>
+    <tr>
+        <td>Tanggal</td>
+        <td>: <?= date('d-m-Y') ?></td>
+    </tr>
+</table>
 
-    <!-- NILAI -->
-    <div class="judul">NILAI MATA PELAJARAN</div>
+<!-- ================= TABLE NILAI ================= -->
+<table class="table-nilai">
+    <tr>
+        <th width="40">No</th>
+        <th>Mata Pelajaran</th>
+        <th width="60">Nilai</th>
+        <th width="80">Predikat</th>
+        <th>Deskripsi</th>
+    </tr>
 
-    <?php
-$no = 1;
-foreach($data_nilai as $d){
+    <?php 
+$no=1;
+foreach($data_nilai as $d):
+
+$nilai = round($d['nilai']);
+
+if($nilai >= 92) $predikat='A';
+elseif($nilai >= 83) $predikat='B';
+elseif($nilai >= 76) $predikat='C';
+else $predikat='D';
 ?>
-    <!-- <table class="table">
+
+    <tr>
+        <td align="center"><?= $no++ ?></td>
+        <td><?= $d['nama_mapel'] ?></td>
+        <td align="center"><?= $nilai ?></td>
+        <td align="center"><?= $predikat ?></td>
+        <td><?= $d['deskripsi'] ?: '-' ?></td>
+    </tr>
+
+    <?php endforeach; ?>
+</table>
+
+<p align="right"><b>Rata-rata: <?= $rata ?></b></p>
+
+<div class="box-kriteria">
+    <b>Kriteria Penilaian</b>
+
+    <table class="table-kriteria" style="border: 1px">
         <tr>
-            <td width="30"><?= $no++ ?></td>
-            <td width="200"><?= $d['nama_mapel'] ?></td>
-            <td width="50"><b><?= round($d['nilai']) ?></b></td>
-            <td><?= $d['deskripsi'] ?: '-' ?></td>
+            <td width="30">A</td>
+            <td>: 92 - 100</td>
         </tr>
-    </table> -->
-    <table class="table-nilai" border="1" cellspacing="0" cellpadding="5">
         <tr>
-            <th>No</th>
-            <th>Mata Pelajaran</th>
-            <th>Nilai</th>
-            <th>Predikat</th>
-            <th>Deskripsi</th>
+            <td>B</td>
+            <td>: 83 - 91</td>
         </tr>
-
-        <?php 
-    $no=1;
-    foreach($data_nilai as $d):
-
-        $nilai = round($d['nilai']);
-
-        // hitung predikat
-        if($nilai >= 92) $predikat = 'A';
-        elseif($nilai >= 83) $predikat = 'B';
-        elseif($nilai >= 76) $predikat = 'C';
-        else $predikat = 'D';
-    ?>
         <tr>
-            <td align="center"><?= $no++ ?></td>
-            <td><?= $d['nama_mapel'] ?></td>
-            <td align="center"><?= $nilai ?></td>
-            <td align="center"><?= $predikat ?></td>
-            <td><?= $d['deskripsi'] ?: '-' ?></td>
+            <td>C</td>
+            <td>: 76 - 82</td>
         </tr>
-        <?php endforeach; ?>
-
-    </table>
-    <?php } ?>
-    <br>
-    <!-- <table width="100%">
         <tr>
-            <td align="right"><b>Rata-rata: <?= $rata ?></b></td>
+            <td>D</td>
+            <td>: &lt; 76</td>
         </tr>
     </table>
-    <br> -->
+</div>
 
+<!-- ================= TTD ================= -->
+<table width="100%" class="ttd">
+    <tr>
+        <td>
+            Mengetahui,<br>
+            Kepala Sekolah<br><br><br><br>
+            <b>________________</b>
+        </td>
 
+        <td>
+            <?= date('d-m-Y') ?><br>
+            Wali Kelas<br><br><br><br>
+            <b>________________</b>
+        </td>
+    </tr>
+</table>
 
-    <!-- RATA -->
-    <p class="bold">Rata-rata: <?= $rata ?></p>
+<!-- ================= CAP (OPSIONAL) ================= -->
+<img src="../assets/images/cap.png" class="cap" width="150">
 
-    <br><br>
+<?php
+$html = ob_get_clean();
 
-    <!-- KETERANGAN -->
-    <p>
-        Kriteria :<br>
-        A : 92 - 100<br>
-        B : 83 - 91<br>
-        C : 76 - 82<br>
-        D : < 76 </p>
+/* ================= DOMPDF ================= */
+$dompdf = new Dompdf();
+$dompdf->loadHtml($html);
 
-            <!-- <br><br> -->
+// SET A4
+$dompdf->setPaper('A4', 'portrait');
 
-            <!-- TTD -->
-            <!-- <table width="100%">
-                <tr>
-                    <td></td>
-                    <td align="center">
-                        Depok, <?= date('d-m-Y') ?><br>
-                        Wali Kelas,<br><br><br>
-                        <b>____________________</b>
-                    </td>
-                </tr>
-            </table> -->
+$dompdf->render();
 
-            <br><br><br>
-
-            <table width="100%">
-                <tr>
-                    <td align="center">
-                        Mengetahui,<br>
-                        Kepala Sekolah<br><br><br>
-                        <b>________________</b>
-                    </td>
-                    <td align="center">
-                        Depok, <?= date('d-m-Y') ?><br>
-                        Wali Kelas<br><br><br>
-                        <b>________________</b>
-                    </td>
-                </tr>
-            </table>
-
-</body>
-
-</html>
+// OUTPUT
+$dompdf->stream("raport.pdf", ["Attachment"=>false]);
