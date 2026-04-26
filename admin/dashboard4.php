@@ -42,33 +42,6 @@ while($d = mysqli_fetch_assoc($data_mapel)){
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-
-<style>
-.card-modern {
-    border-radius: 15px;
-    border: none;
-    transition: 0.3s;
-}
-
-.card-modern:hover {
-    transform: translateY(-5px);
-}
-
-.card-modern .card-body {
-    display: flex;
-    align-items: center;
-}
-
-.card-icon {
-    font-size: 40px;
-}
-
-.card-text {
-    margin-left: 15px;
-}
-</style>
-
 <?php include 'template.php'; ?>
 
 <div class="container-fluid mt-4">
@@ -95,7 +68,7 @@ while($d = mysqli_fetch_assoc($data_mapel)){
     <!-- CARD UTAMA -->
     <div class="row">
 
-        <!-- <div class="col-md-3 mb-3">
+        <div class="col-md-3 mb-3">
             <div class="card bg-primary text-white shadow">
                 <div class="card-body">
                     <h6>Total Siswa</h6>
@@ -129,54 +102,6 @@ while($d = mysqli_fetch_assoc($data_mapel)){
                     <h3><?= $rerata ?></h3>
                 </div>
             </div>
-        </div> -->
-
-        <div class="col-md-3 mb-3">
-            <div class="card shadow card-modern">
-                <div class="card-body">
-                    <i class='bx bx-group text-primary card-icon'></i>
-                    <div class="card-text">
-                        <small>Total Siswa</small>
-                        <h4><?= $total_siswa ?></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card shadow card-modern">
-                <div class="card-body">
-                    <i class='bx bx-user text-success card-icon'></i>
-                    <div class="card-text">
-                        <small>Total Guru</small>
-                        <h4><?= $total_guru ?></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card shadow card-modern">
-                <div class="card-body">
-                    <i class='bx bx-book text-warning card-icon'></i>
-                    <div class="card-text">
-                        <small>Total Mapel</small>
-                        <h4><?= $total_mapel ?></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3 mb-3">
-            <div class="card shadow card-modern">
-                <div class="card-body">
-                    <i class='bx bx-line-chart text-dark card-icon'></i>
-                    <div class="card-text">
-                        <small>Rerata Nilai</small>
-                        <h4><?= $rerata ?></h4>
-                    </div>
-                </div>
-            </div>
         </div>
 
     </div>
@@ -184,7 +109,7 @@ while($d = mysqli_fetch_assoc($data_mapel)){
     <!-- CARD NILAI -->
     <div class="row">
 
-        <!-- <div class="col-md-4 mb-3">
+        <div class="col-md-4 mb-3">
             <div class="card bg-info text-white shadow">
                 <div class="card-body">
                     <h6>Nilai Tertinggi</h6>
@@ -213,46 +138,6 @@ while($d = mysqli_fetch_assoc($data_mapel)){
                         </div>
                     </div>
 
-                </div>
-            </div>
-        </div> -->
-
-        <div class="col-md-4 mb-3">
-            <div class="card shadow card-modern">
-                <div class="card-body">
-                    <i class='bx bx-trophy text-success card-icon'></i>
-                    <div class="card-text">
-                        <small>Nilai Tertinggi</small>
-                        <h4><?= $max ?></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <div class="card shadow card-modern">
-                <div class="card-body">
-                    <i class='bx bx-down-arrow text-danger card-icon'></i>
-                    <div class="card-text">
-                        <small>Nilai Terendah</small>
-                        <h4><?= $min ?></h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-3">
-            <div class="card shadow card-modern">
-                <div class="card-body" style="display:block;">
-
-
-                    <div class="progress mt-2" style="height:8px; border-radius:10px;">
-                        <div class="progress-bar bg-success" style="width: <?= $rerata ?>%"></div>
-                    </div>
-
-                    <div>
-                        <h5 class="mt-2">Rata-rata Nilai (%): <?= $rerata ?>%</h5>
-                    </div>
                 </div>
             </div>
         </div>

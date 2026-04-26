@@ -54,8 +54,8 @@
                 <a class="nav-link text-white" href="input_nilai.php">
                     📝 Input Nilai
                 </a>
-                <a class="nav-link text-white" href="data_nilai.php">
-                    📚 Data Nilai
+                <a class="nav-link text-white" href="ranking.php">
+                    📚 Peringkat
                 </a>
 
                 <a class="nav-link text-white" href="profil.php">
