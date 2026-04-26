@@ -210,10 +210,18 @@ foreach($data_nilai as $d){
             <td><?= $d['deskripsi'] ?: '-' ?></td>
         </tr>
         <?php endforeach; ?>
+
     </table>
     <?php } ?>
-
     <br>
+    <!-- <table width="100%">
+        <tr>
+            <td align="right"><b>Rata-rata: <?= $rata ?></b></td>
+        </tr>
+    </table>
+    <br> -->
+
+
 
     <!-- RATA -->
     <p class="bold">Rata-rata: <?= $rata ?></p>
@@ -228,16 +236,33 @@ foreach($data_nilai as $d){
         C : 76 - 82<br>
         D : < 76 </p>
 
-            <br><br>
+            <!-- <br><br> -->
 
             <!-- TTD -->
-            <table width="100%">
+            <!-- <table width="100%">
                 <tr>
                     <td></td>
                     <td align="center">
                         Depok, <?= date('d-m-Y') ?><br>
                         Wali Kelas,<br><br><br>
                         <b>____________________</b>
+                    </td>
+                </tr>
+            </table> -->
+
+            <br><br><br>
+
+            <table width="100%">
+                <tr>
+                    <td align="center">
+                        Mengetahui,<br>
+                        Kepala Sekolah<br><br><br>
+                        <b>________________</b>
+                    </td>
+                    <td align="center">
+                        Depok, <?= date('d-m-Y') ?><br>
+                        Wali Kelas<br><br><br>
+                        <b>________________</b>
                     </td>
                 </tr>
             </table>
