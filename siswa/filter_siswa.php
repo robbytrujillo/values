@@ -2,6 +2,8 @@
 session_start();
 include '../config/koneksi.php';
 
+header('Content-Type: application/json');
+
 function getRankingByMapel($conn, $siswa_id, $jenis, $mapel_id=''){
     $q = mysqli_query($conn,"SELECT kelas_id FROM siswa WHERE id='$siswa_id'");
     $s = mysqli_fetch_assoc($q);
@@ -67,11 +69,11 @@ ORDER BY n.tanggal DESC
 $list = [];
 while($d=mysqli_fetch_assoc($data)){
     $list[] = [
-        'tanggal' => $d['tanggal'],
-        'nama_mapel' => $d['nama_mapel'],
-        'nilai' => $d['nilai'],
-        'jenis' => ucfirst($d['jenis'])
-    ];
+    'tanggal' => hariIndonesia($d['tanggal']) . ', ' . tanggalIndonesia($d['tanggal']),
+    'nama_mapel' => $d['nama_mapel'],
+    'nilai' => $d['nilai'],
+    'jenis' => ucfirst($d['jenis'])
+];
 }
 
 // ranking
@@ -105,6 +107,35 @@ LIMIT 5
 $top_list = [];
 while($t=mysqli_fetch_assoc($q_top)){
     $top_list[] = $t;
+}
+
+function hariIndonesia($tanggal) {
+    $hari = date('l', strtotime($tanggal));
+
+    $hariIndo = [
+        'Sunday'    => 'Minggu',
+        'Monday'    => 'Senin',
+        'Tuesday'   => 'Selasa',
+        'Wednesday' => 'Rabu',
+        'Thursday'  => 'Kamis',
+        'Friday'    => 'Jumat',
+        'Saturday'  => 'Sabtu'
+    ];
+
+    return $hariIndo[$hari];
+}
+
+function tanggalIndonesia($tanggal) {
+    $bulan = [
+        1 => 'Januari','Februari','Maret','April','Mei','Juni',
+        'Juli','Agustus','September','Oktober','November','Desember'
+    ];
+
+    $pecah = explode('-', date('Y-m-d', strtotime($tanggal)));
+
+    return $pecah[2] . ' ' .
+           $bulan[(int)$pecah[1]] . ' ' .
+           $pecah[0];
 }
 
 echo json_encode([

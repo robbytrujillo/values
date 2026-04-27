@@ -105,6 +105,39 @@ GROUP BY s.id
 ORDER BY total DESC
 LIMIT 5
 ");
+
+/* ======================
+   HARI INDO
+====================== */
+function hariIndonesia($tanggal) {
+    $hari = date('l', strtotime($tanggal));
+
+    $hariIndo = [
+        'Sunday'    => 'Minggu',
+        'Monday'    => 'Senin',
+        'Tuesday'   => 'Selasa',
+        'Wednesday' => 'Rabu',
+        'Thursday'  => 'Kamis',
+        'Friday'    => 'Jumat',
+        'Saturday'  => 'Sabtu'
+    ];
+
+    return $hariIndo[$hari];
+}
+
+function tanggalIndonesia($tanggal) {
+
+    $bulan = [
+        1 => 'Januari','Februari','Maret','April','Mei','Juni',
+        'Juli','Agustus','September','Oktober','November','Desember'
+    ];
+
+    $tanggalExplode = explode('-', date('Y-m-d', strtotime($tanggal)));
+
+    return $tanggalExplode[2] . ' ' .
+           $bulan[(int)$tanggalExplode[1]] . ' ' .
+           $tanggalExplode[0];
+}
 ?>
 
 <!DOCTYPE html>
@@ -464,7 +497,11 @@ LIMIT 5
                         <tbody>
                             <?php while($d=mysqli_fetch_assoc($q)){ ?>
                             <tr>
-                                <td><?= date('d-m-Y', strtotime($d['tanggal'])) ?></td>
+                                <!-- <td><?= date('d-m-Y', strtotime($d['tanggal'])) ?></td> -->
+                                <td>
+                                    <?= hariIndonesia($d['tanggal']); ?>,
+                                    <?= tanggalIndonesia($d['tanggal']); ?>
+                                </td>
                                 <td><?= $d['nama_mapel'] ?></td>
                                 <td><?= $d['nilai'] ?></td>
                                 <td><?= ucfirst($d['jenis']) ?></td>
