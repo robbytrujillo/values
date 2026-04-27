@@ -733,13 +733,14 @@ if(!$q_top){
                 <!-- <a href="print_raport.php" target="_blank" class="btn btn-primary">
                     Print Raport
                 </a> -->
-                <a href="print_raport.php?jenis=harian" target="_blank" class="btn btn-info rounded-pill">Print
-                    Harian</a>
-                <a href="print_raport.php?jenis=bulanan" target="_blank" class="btn btn-warning rounded-pill">Print
-                    Bulanan</a>
-                <a href="print_raport.php?jenis=semester" target="_blank" class="btn btn-success rounded-pill">Print
-                    Semester</a>
-
+                <div class="text-center">
+                    <a href="print_raport.php?jenis=harian" target="_blank" class="btn btn-info rounded-pill">Print
+                        Harian</a>
+                    <a href="print_raport.php?jenis=bulanan" target="_blank" class="btn btn-warning rounded-pill">Print
+                        Bulanan</a>
+                    <a href="print_raport.php?jenis=semester" target="_blank" class="btn btn-success rounded-pill">Print
+                        Semester</a>
+                </div>
             </div>
         </div>
 
