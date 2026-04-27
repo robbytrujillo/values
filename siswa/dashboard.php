@@ -604,49 +604,46 @@ if(!$q_top){
 
         </div>
 
+        <!-- Top 5 Siswa -->
         <div class="card mb-4 shadow border-0" style="border-radius:15px;">
-            <div class="card-body" id="topSiswaContainer">
+            <div class="card-body">
 
-                <h5 class="mb-3">🏆 Top 5 Siswa Kelas</h5>
+                <h5 class="mb-3 text-center" id="judulTop">
+                    🏆 Top 5 Siswa Kelas (Semua Mapel)
+                </h5>
 
-                <?php $no=1; while($t=mysqli_fetch_assoc($q_top)){ ?>
-                <div class="d-flex align-items-center mb-3 p-2" style="border-radius:10px; background:#f8fafc;">
+                <div id="topSiswaContainer">
+                    <?php $no=1; while($t=mysqli_fetch_assoc($q_top)){ ?>
+                    <div class="d-flex align-items-center mb-3 p-2" style="border-radius:10px; background:#f8fafc;">
 
-                    <!-- RANK -->
-                    <div style="width:40px; font-weight:bold;">
-                        <?= $no ?>
+                        <div style="width:40px; font-weight:bold;">
+                            <?= $no ?>
+                        </div>
+
+                        <?php
+                $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['nama']);
+                ?>
+
+                        <img src="<?= $avatar ?>" width="45" height="45" style="border-radius:50%;">
+
+                        <div class="ml-3 flex-grow-1">
+                            <div><?= $t['nama'] ?></div>
+                            <small class="text-muted">Total: <?= $t['total'] ?></small>
+                        </div>
+
+                        <div>
+                            <?php if($no==1){ ?>
+                            <span>🥇</span>
+                            <?php }elseif($no==2){ ?>
+                            <span>🥈</span>
+                            <?php }elseif($no==3){ ?>
+                            <span>🥉</span>
+                            <?php } ?>
+                        </div>
+
                     </div>
-
-                    <?php
-// generate avatar unik dari nama
-$avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['nama']);
-?>
-
-                    <!-- FOTO -->
-                    <!-- <img src="../assets/foto/<?= $t['foto'] ?? 'default.png' ?>" width="45" height="45"
-                        style="border-radius:50%; object-fit:cover;"> -->
-
-                    <img src="<?= $avatar ?>" width="45" height="45" style="border-radius:50%;">
-
-                    <!-- NAMA -->
-                    <div class="ml-3 flex-grow-1">
-                        <div><?= $t['nama'] ?></div>
-                        <small class="text-muted">Total: <?= $t['total'] ?></small>
-                    </div>
-
-                    <!-- BADGE -->
-                    <div>
-                        <?php if($no==1){ ?>
-                        <span class="badge badge-warning">🥇</span>
-                        <?php }elseif($no==2){ ?>
-                        <span class="badge badge-secondary">🥈</span>
-                        <?php }elseif($no==3){ ?>
-                        <span class="badge badge-dark">🥉</span>
-                        <?php } ?>
-                    </div>
-
+                    <?php $no++; } ?>
                 </div>
-                <?php $no++; } ?>
 
             </div>
         </div>
@@ -688,13 +685,13 @@ $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['na
         </div> -->
 
         <!-- CHART -->
-        <div class="card mb-4">
+        <div class="card mb-4" style="border-radius: 15px">
             <div class="card-body">
                 <canvas id="chartNilai"></canvas>
             </div>
         </div>
 
-        <div class="card mb-4">
+        <div class="card mb-4" style="border-radius: 15px">
             <div class="card-body">
                 <h6>Progress Nilai</h6>
                 <div class="progress">
@@ -1012,7 +1009,7 @@ $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['na
     </script>
 
     <!-- Filter Mapel -->
-    <script>
+    <!-- <script>
     document.getElementById('filterMapel').addEventListener('change', function() {
 
         let mapel_id = this.value;
@@ -1052,6 +1049,123 @@ $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['na
 
                 // ================= TOP 5 =================
                 let topHtml = `<h5 class="mb-3">🏆 Top 5 Siswa Kelas</h5>`;
+
+                res.top_siswa.forEach((siswa, index) => {
+
+                    let medal = '';
+                    if (index === 0) medal = '🥇';
+                    else if (index === 1) medal = '🥈';
+                    else if (index === 2) medal = '🥉';
+
+                    let avatar =
+                        `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(siswa.nama)}`;
+
+                    topHtml += `
+                <div class="d-flex align-items-center mb-3 p-2" style="border-radius:10px; background:#f8fafc;">
+                    <div style="width:40px; font-weight:bold;">${index + 1}</div>
+
+                    <img src="${avatar}" width="45" height="45" style="border-radius:50%;">
+
+                    <div class="ml-3 flex-grow-1">
+                        <div>${siswa.nama}</div>
+                        <small class="text-muted">Total: ${siswa.total}</small>
+                    </div>
+
+                    <div>${medal}</div>
+                </div>`;
+                });
+
+                document.getElementById('topSiswaContainer').innerHTML = topHtml;
+
+                // ================= CHART =================
+                loadChart(mapel_id);
+
+            });
+
+    });
+    </script> -->
+
+    <script>
+    let chart;
+
+    function loadChart(mapel_id = '') {
+
+        fetch('chart_siswa.php?mapel_id=' + mapel_id)
+            .then(res => res.json())
+            .then(data => {
+
+                let labels = [];
+                let nilai = [];
+
+                data.forEach(d => {
+                    labels.push(d.mapel);
+                    nilai.push(d.nilai);
+                });
+
+                if (chart) {
+                    chart.destroy();
+                }
+
+                chart = new Chart(document.getElementById('chartNilai'), {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Nilai',
+                            data: nilai
+                        }]
+                    }
+                });
+
+            });
+    }
+
+    // LOAD AWAL
+    loadChart();
+
+    document.getElementById('filterMapel').addEventListener('change', function() {
+
+        let mapel_id = this.value;
+
+        fetch('filter_siswa.php?mapel_id=' + mapel_id)
+            .then(res => res.json())
+            .then(res => {
+
+                // ================= JUDUL DINAMIS =================
+                let namaMapel = this.options[this.selectedIndex].text;
+                document.getElementById('judulTop').innerText =
+                    "🏆 Top 5 Siswa Kelas (" + namaMapel + ")";
+
+                // ================= CARD =================
+                document.getElementById('rata').innerText = res.rata;
+                document.getElementById('max').innerText = res.max;
+                document.getElementById('min').innerText = res.min;
+                document.getElementById('total').innerText = res.total;
+
+                document.getElementById('rank_harian').innerText = res.rank_harian;
+                document.getElementById('rank_bulanan').innerText = res.rank_bulanan;
+                document.getElementById('rank_semester').innerText = res.rank_semester;
+
+                let progress = document.getElementById('progressBar');
+                progress.style.width = res.rata + '%';
+                progress.innerText = res.rata + '%';
+
+                // ================= TABLE =================
+                let html = '';
+                res.data.forEach(d => {
+                    html += `
+                <tr>
+                    <td>${d.tanggal}</td>
+                    <td>${d.nama_mapel}</td>
+                    <td>${d.nilai}</td>
+                    <td>${d.jenis}</td>
+                </tr>`;
+                });
+
+                document.getElementById('tableBody').innerHTML = html;
+
+                // ================= TOP 5 =================
+                let topHtml = '';
 
                 res.top_siswa.forEach((siswa, index) => {
 
