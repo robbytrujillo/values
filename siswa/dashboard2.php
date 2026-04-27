@@ -226,25 +226,6 @@ if(!$q_top){
         color: #333 !important;
     }
 
-    /* TOP 5 DARK MODE */
-    body.dark #topSiswaContainer h5 {
-        color: #fff;
-    }
-
-    body.dark #topSiswaContainer .text-muted {
-        color: #cbd5e1 !important;
-        /* abu terang */
-    }
-
-    body.dark #topSiswaContainer div {
-        color: #fff;
-    }
-
-    /* background item top 5 */
-    body.dark #topSiswaContainer .d-flex {
-        background: #334155 !important;
-    }
-
     /* hero */
     .hero {
         padding: 100px 20px;
@@ -314,17 +295,6 @@ if(!$q_top){
     body.dark table tbody tr:hover {
         background: #334155;
     }
-
-    /* JARAK CARD MOBILE */
-    @media (max-width: 768px) {
-        .row>div[class*="col-md-"] {
-            margin-bottom: 15px;
-        }
-    }
-
-    .card {
-        margin-bottom: 15px;
-    }
     </style>
 </head>
 
@@ -348,15 +318,10 @@ if(!$q_top){
         </div>
     </nav>
 
-
-
     <div class="container mt-4">
 
         <h4><strong style="font-weight: bold">Dashboard Siswa</strong></h4>
-
-
-
-        <div class="card" style="border-radius: 15px">
+        <div class="card">
             <div class="col-md-12 text-center">
                 <div class="body">
                     <br>
@@ -368,44 +333,6 @@ if(!$q_top){
             </div>
         </div>
         <br>
-
-        <!-- <select id="filterMapel" class="form-control mb-3">
-            <option value="">Semua Mapel</option>
-            <?php
-    $mapel = mysqli_query($conn,"
-        SELECT DISTINCT m.id, m.nama_mapel
-        FROM nilai n
-        JOIN mapel m ON n.mapel_id = m.id
-        WHERE n.siswa_id='$siswa_id'
-    ");
-    while($m=mysqli_fetch_assoc($mapel)){
-        echo "<option value='{$m['id']}'>{$m['nama_mapel']}</option>";
-    }
-    ?>
-        </select> -->
-
-        <div class="d-flex justify-content-center align-items-center mb-3" style="gap:10px">
-
-            <label for="filterMapel" class="mb-0 font-weight-bold">
-                Pilih Mapel:
-            </label>
-
-            <select id="filterMapel" class="form-control" style="max-width:220px;">
-                <option value="">Semua</option>
-                <?php
-        $mapel = mysqli_query($conn,"
-            SELECT DISTINCT m.id, m.nama_mapel
-            FROM nilai n
-            JOIN mapel m ON n.mapel_id = m.id
-            WHERE n.siswa_id='$siswa_id'
-        ");
-        while($m=mysqli_fetch_assoc($mapel)){
-            echo "<option value='{$m['id']}'>{$m['nama_mapel']}</option>";
-        }
-        ?>
-            </select>
-
-        </div>
 
         <!-- STATISTIK SISWA -->
         <!-- <div class="row text-center mb-4">
@@ -458,7 +385,7 @@ if(!$q_top){
                         <i class='bx bx-line-chart text-primary' style="font-size:40px;"></i>
                         <div class="ml-3 text-left">
                             <small>Rata-rata</small>
-                            <h4 id="rata"><?= $rata_siswa ?></h4>
+                            <h4><?= $rata_siswa ?></h4>
                         </div>
                     </div>
                 </div>
@@ -470,7 +397,7 @@ if(!$q_top){
                         <i class='bx bx-trophy text-success' style="font-size:40px;"></i>
                         <div class="ml-3 text-left">
                             <small>Tertinggi</small>
-                            <h4 id="max"><?= $max_siswa ?></h4>
+                            <h4><?= $max_siswa ?></h4>
                         </div>
                     </div>
                 </div>
@@ -482,7 +409,7 @@ if(!$q_top){
                         <i class='bx bx-down-arrow text-danger' style="font-size:40px;"></i>
                         <div class="ml-3 text-left">
                             <small>Terendah</small>
-                            <h4 id="min"><?= $min_siswa ?></h4>
+                            <h4><?= $min_siswa ?></h4>
                         </div>
                     </div>
                 </div>
@@ -494,7 +421,7 @@ if(!$q_top){
                         <i class='bx bx-bar-chart text-dark' style="font-size:40px;"></i>
                         <div class="ml-3 text-left">
                             <small>Total</small>
-                            <h4 id="total"><?= $total_siswa ?></h4>
+                            <h4><?= $total_siswa ?></h4>
                         </div>
                     </div>
                 </div>
@@ -544,7 +471,7 @@ if(!$q_top){
                         <div class="d-flex justify-content-between">
                             <div>
                                 <small>Ranking Harian</small>
-                                <h2 id="rank_harian"><?= $rank_harian ?></h2>
+                                <h2><?= $rank_harian ?></h2>
                             </div>
                             <i class='bx bx-trending-up' style="font-size:40px;"></i>
                         </div>
@@ -567,7 +494,7 @@ if(!$q_top){
                         <div class="d-flex justify-content-between">
                             <div>
                                 <small>Ranking Bulanan</small>
-                                <h2 id="rank_bulanan"><?= $rank_bulanan ?></h2>
+                                <h2><?= $rank_bulanan ?></h2>
                             </div>
                             <i class='bx bx-calendar' style="font-size:40px;"></i>
                         </div>
@@ -589,7 +516,7 @@ if(!$q_top){
                         <div class="d-flex justify-content-between">
                             <div>
                                 <small>Ranking Semester</small>
-                                <h2 id="rank_semester"><?= $rank_semester ?></h2>
+                                <h2><?= $rank_semester ?></h2>
                             </div>
                             <i class='bx bx-award' style="font-size:40px;"></i>
                         </div>
@@ -605,7 +532,7 @@ if(!$q_top){
         </div>
 
         <div class="card mb-4 shadow border-0" style="border-radius:15px;">
-            <div class="card-body" id="topSiswaContainer">
+            <div class="card-body">
 
                 <h5 class="mb-3">🏆 Top 5 Siswa Kelas</h5>
 
@@ -698,7 +625,7 @@ $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['na
             <div class="card-body">
                 <h6>Progress Nilai</h6>
                 <div class="progress">
-                    <div class="progress-bar bg-success" id="progressBar" style="width: <?= $rata_siswa ?>%">
+                    <div class="progress-bar bg-success" style="width: <?= $rata_siswa ?>%">
                         <?= $rata_siswa ?>%
                     </div>
                 </div>
@@ -710,26 +637,21 @@ $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['na
             <div class="card-body">
 
                 <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>Tanggal</th>
-                            <th>Mapel</th>
-                            <th>Nilai</th>
-                            <th>Jenis</th>
-                        </tr>
-                    </thead>
+                    <tr>
+                        <th>Tanggal</th>
+                        <th>Mapel</th>
+                        <th>Nilai</th>
+                        <th>Jenis</th>
+                    </tr>
 
-                    <tbody id="tableBody">
-                        <?php while($d=mysqli_fetch_assoc($q)){ ?>
-                        <tr>
-                            <td><?= $d['tanggal'] ?></td>
-                            <td><?= $d['nama_mapel'] ?></td>
-                            <td><?= $d['nilai'] ?></td>
-                            <td><?= ucfirst($d['jenis']) ?></td>
-                        </tr>
-                        <?php } ?>
-                    </tbody>
-
+                    <?php while($d=mysqli_fetch_assoc($q)){ ?>
+                    <tr>
+                        <td><?= $d['tanggal'] ?></td>
+                        <td><?= $d['nama_mapel'] ?></td>
+                        <td><?= $d['nilai'] ?></td>
+                        <td><?= ucfirst($d['jenis']) ?></td>
+                    </tr>
+                    <?php } ?>
 
                 </table>
 
@@ -752,7 +674,7 @@ $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['na
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- <script>
+    <script>
     fetch('chart_siswa.php')
         .then(res => res.json())
         .then(data => {
@@ -777,9 +699,9 @@ $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['na
             });
 
         });
-    </script> -->
+    </script>
 
-    <!-- <script>
+    <script>
     fetch('chart_siswa.php')
         .then(res => res.json())
         .then(data => {
@@ -840,10 +762,10 @@ $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['na
             chart.render();
 
         });
-    </script> -->
+    </script>
 
 
-    <!-- <script>
+    <script>
     fetch('chart_siswa.php')
         .then(res => res.json())
         .then(data => {
@@ -883,7 +805,7 @@ $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['na
             var chart = new ApexCharts(document.querySelector("#chartNilai"), options);
             chart.render();
         });
-    </script> -->
+    </script>
 
     <!-- JS -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
@@ -1010,158 +932,6 @@ $avatar = "https://api.dicebear.com/7.x/adventurer/svg?seed=" . urlencode($t['na
             });
     }
     </script>
-
-    <!-- Filter Mapel -->
-    <script>
-    document.getElementById('filterMapel').addEventListener('change', function() {
-
-        let mapel_id = this.value;
-
-        fetch('filter_siswa.php?mapel_id=' + mapel_id)
-            .then(res => res.json())
-            .then(res => {
-
-                // ================= CARD =================
-                document.getElementById('rata').innerText = res.rata;
-                document.getElementById('max').innerText = res.max;
-                document.getElementById('min').innerText = res.min;
-                document.getElementById('total').innerText = res.total;
-
-                document.getElementById('rank_harian').innerText = res.rank_harian;
-                document.getElementById('rank_bulanan').innerText = res.rank_bulanan;
-                document.getElementById('rank_semester').innerText = res.rank_semester;
-
-                // progress
-                let progress = document.getElementById('progressBar');
-                progress.style.width = res.rata + '%';
-                progress.innerText = res.rata + '%';
-
-                // ================= TABLE =================
-                let html = '';
-                res.data.forEach(d => {
-                    html += `
-                <tr>
-                    <td>${d.tanggal}</td>
-                    <td>${d.nama_mapel}</td>
-                    <td>${d.nilai}</td>
-                    <td>${d.jenis}</td>
-                </tr>`;
-                });
-
-                document.getElementById('tableBody').innerHTML = html;
-
-                // ================= TOP 5 =================
-                let topHtml = `<h5 class="mb-3">🏆 Top 5 Siswa Kelas</h5>`;
-
-                res.top_siswa.forEach((siswa, index) => {
-
-                    let medal = '';
-                    if (index === 0) medal = '🥇';
-                    else if (index === 1) medal = '🥈';
-                    else if (index === 2) medal = '🥉';
-
-                    let avatar =
-                        `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(siswa.nama)}`;
-
-                    topHtml += `
-                <div class="d-flex align-items-center mb-3 p-2" style="border-radius:10px; background:#f8fafc;">
-                    <div style="width:40px; font-weight:bold;">${index + 1}</div>
-
-                    <img src="${avatar}" width="45" height="45" style="border-radius:50%;">
-
-                    <div class="ml-3 flex-grow-1">
-                        <div>${siswa.nama}</div>
-                        <small class="text-muted">Total: ${siswa.total}</small>
-                    </div>
-
-                    <div>${medal}</div>
-                </div>`;
-                });
-
-                document.getElementById('topSiswaContainer').innerHTML = topHtml;
-
-                // ================= CHART =================
-                loadChart(mapel_id);
-
-            });
-
-    });
-    </script>
-
-    <script>
-    let topHtml = `<h5 class="mb-3">🏆 Top 5 Siswa Kelas</h5>`;
-
-    res.top_siswa.forEach((siswa, index) => {
-        let medal = '';
-        if (index === 0) medal = '🥇';
-        else if (index === 1) medal = '🥈';
-        else if (index === 2) medal = '🥉';
-
-        let avatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(siswa.nama)}`;
-
-        topHtml += `
-        <div class="d-flex align-items-center mb-3 p-2" 
-             style="border-radius:10px; background:#f8fafc;">
-            <div style="width:40px; font-weight:bold;">
-                ${index + 1}
-            </div>
-
-            <img src="${avatar}" width="45" height="45" 
-                 style="border-radius:50%;">
-
-            <div class="ml-3 flex-grow-1">
-                <div>${siswa.nama}</div>
-                <small class="text-muted">Total: ${siswa.total}</small>
-            </div>
-
-            <div>${medal}</div>
-        </div>
-    `;
-    });
-
-    document.getElementById('topSiswaContainer').innerHTML = topHtml;
-    </script>
-
-    <script>
-    let chart; // global chart
-
-    function loadChart(mapel_id = '') {
-
-        fetch('chart_siswa.php?mapel_id=' + mapel_id)
-            .then(res => res.json())
-            .then(data => {
-
-                let labels = [];
-                let nilai = [];
-
-                data.forEach(d => {
-                    labels.push(d.mapel);
-                    nilai.push(d.nilai);
-                });
-
-                // destroy chart lama
-                if (chart) {
-                    chart.destroy();
-                }
-
-                chart = new Chart(document.getElementById('chartNilai'), {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Nilai',
-                            data: nilai
-                        }]
-                    }
-                });
-
-            });
-    }
-
-    // load awal
-    loadChart();
-    </script>
-
 
 </body>
 
