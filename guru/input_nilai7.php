@@ -174,7 +174,9 @@ function tanggalIndonesia($tanggal) {
     .form-inline select {
         min-width: 180px;
     }
+    </style>
 
+    <style>
     .card {
         border: none;
         border-radius: 15px;
@@ -264,6 +266,7 @@ function tanggalIndonesia($tanggal) {
 
     /* MOBILE */
     @media(max-width:767px) {
+
         .form-inline {
             display: block !important;
         }
@@ -315,10 +318,13 @@ function tanggalIndonesia($tanggal) {
 
     <div class="container-fluid mt-4">
 
+        <!-- HEADER -->
         <div class="d-flex justify-content-between mb-3 text-center">
             <h4>INPUT NILAI</h4>
+            <!-- <p>Welcome <strong style="color: red;"><?= $_SESSION['user']['nama']; ?></strong></p> -->
         </div>
 
+        <!-- FILTER (VERSI CLEAN) -->
         <div class="card mb-3">
             <div class="card-body">
                 <form method="GET" class="form-inline">
@@ -337,10 +343,12 @@ function tanggalIndonesia($tanggal) {
             </div>
         </div>
 
+        <!-- BUTTON -->
         <button class="btn btn-primary mb-3 rounded-pill" data-toggle="modal" data-target="#modalForm">
             Tambah Nilai
         </button>
 
+        <!-- IMPORT -->
         <div class="card mb-3">
             <div class="card-body">
                 <form method="POST" enctype="multipart/form-data" class="form-inline">
@@ -351,6 +359,7 @@ function tanggalIndonesia($tanggal) {
             </div>
         </div>
 
+        <!-- TABLE -->
         <div class="card">
             <div class="card-body">
 
@@ -388,13 +397,15 @@ function tanggalIndonesia($tanggal) {
 
                                 <td>
                                     <span class="badge badge-<?=
-    $d['jenis']=='harian' ? 'info' :
-    ($d['jenis']=='bulanan' ? 'warning' : 'success')
-?>">
+                                $d['jenis']=='harian' ? 'info' :
+                                ($d['jenis']=='bulanan' ? 'warning' : 'success')
+                            ?>">
+                                        <?= ucfirst($d['jenis']) ?>
+                                    </span>
                                 </td>
 
                                 <td>
-                                    <div class=" d-flex flex-column flex-md-row">
+                                    <div class="d-flex flex-column flex-md-row">
                                         <button class="btn btn-warning btn-sm mb-1 mr-md-1" onclick="editData(
                                         '<?= $d['id'] ?>',
                                         '<?= $d['nilai'] ?>',
@@ -422,6 +433,7 @@ function tanggalIndonesia($tanggal) {
 
     </div>
 
+    <!-- MODAL -->
     <div class="modal fade" id="modalForm">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -429,14 +441,7 @@ function tanggalIndonesia($tanggal) {
                 <form method="POST">
                     <div class="modal-body">
 
-                        <select name="tipe_input" id="tipe_input" class="form-control mb-2" onchange="toggleTipeInput()"
-                            required>
-                            <option value="per_orang">Input Per Siswa</option>
-                            <option value="per_kelas">Input Sekaligus Per Kelas</option>
-                        </select>
-
-                        <select name="kelas_filter" id="kelas_filter" class="form-control mb-2" onchange="filterSiswa()"
-                            required>
+                        <select id="kelas_filter" class="form-control mb-2" onchange="filterSiswa()" required>
                             <option value="">Pilih Kelas</option>
                             <?php
                         $kelas = mysqli_query($conn,"SELECT * FROM kelas WHERE id IN ($kelas_ids_str)");
@@ -456,7 +461,7 @@ function tanggalIndonesia($tanggal) {
                         ?>
                         </select>
 
-                        <select name="mapel_id" id="mapel_id" class="form-control mb-2" required>
+                        <select name="mapel_id" class="form-control mb-2" required>
                             <option value="">Pilih Mapel</option>
                             <?php
                         $mapel = mysqli_query($conn,"SELECT * FROM mapel WHERE id IN ($mapel_ids_str)");
@@ -466,19 +471,18 @@ function tanggalIndonesia($tanggal) {
                         ?>
                         </select>
 
-                        <select name="jenis_nilai" id="jenis_nilai" class="form-control mb-2" required>
+                        <input type="number" name="nilai" class="form-control mb-2" placeholder="Nilai" required>
+
+                        <select name="jenis_nilai" class="form-control mb-2" required>
                             <option value="">Pilih Jenis</option>
                             <option value="harian">Harian</option>
                             <option value="bulanan">Bulanan</option>
                             <option value="semester">Semester</option>
                         </select>
 
-                        <input type="number" name="nilai" class="form-control mb-2" placeholder="Masukan Nilai"
-                            required>
                         <input type="date" name="tanggal" class="form-control mb-2" required>
 
-                        <textarea name="deskripsi" id="deskripsi" class="form-control mb-2"
-                            placeholder="Deskripsi (Otomatis menyesuaikan)"></textarea>
+                        <textarea name="deskripsi" class="form-control mb-2"></textarea>
 
                         <button type="submit" name="simpan" class="btn btn-primary">Simpan</button>
 
@@ -489,6 +493,7 @@ function tanggalIndonesia($tanggal) {
         </div>
     </div>
 
+    <!-- MODAL EDIT -->
     <div class="modal fade" id="modalEdit">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -537,37 +542,7 @@ function tanggalIndonesia($tanggal) {
             let k = $(this).data('kelas');
             $(this).toggle(!k || kelas == "" || k == kelas);
         });
-        $('#siswa_id').val(''); // Reset pilihan siswa setiap ganti kelas
-        generateDeskripsi(); // Panggil fungsi auto-deskripsi
     }
-
-    // TAMBAHAN: Fungsi untuk menyembunyikan pilihan siswa jika memilih input "Per Kelas"
-    function toggleTipeInput() {
-        let tipe = $('#tipe_input').val();
-        if (tipe === 'per_kelas') {
-            $('#siswa_id').hide().removeAttr('required');
-        } else {
-            $('#siswa_id').show().attr('required', 'required');
-        }
-    }
-
-    // TAMBAHAN: Fungsi Auto Generate Deskripsi
-    function generateDeskripsi() {
-        let namaKelas = $('#kelas_filter option:selected').text();
-        let namaMapel = $('#mapel_id option:selected').text();
-        let namaJenis = $('#jenis_nilai option:selected').text();
-
-        // Pastikan bukan option default "Pilih..." yang terambil
-        if ($('#kelas_filter').val() !== "" && $('#mapel_id').val() !== "" && $('#jenis_nilai').val() !== "") {
-            let deskripsiOtomatis = `Penilaian ${namaJenis} untuk Mata Pelajaran ${namaMapel} Kelas ${namaKelas}`;
-            $('#deskripsi').val(deskripsiOtomatis);
-        }
-    }
-
-    // Event listener untuk trigger Auto-Deskripsi
-    $('#mapel_id, #jenis_nilai').change(function() {
-        generateDeskripsi();
-    });
     </script>
 
     <script>
@@ -687,9 +662,7 @@ function tanggalIndonesia($tanggal) {
 <?php
 if(isset($_POST['simpan'])){
 
-// TAMBAHAN: Penyesuaian variabel tangkapan
-$tipe_input = $_POST['tipe_input'];
-$kelas_id = $_POST['kelas_filter']; // Didapat dari dropdown kelas yang sekarang diberi atribut name
+$siswa_id = $_POST['siswa_id'];
 $mapel_id = $_POST['mapel_id'];
 $nilai    = (int)$_POST['nilai'];
 $jenis    = $_POST['jenis_nilai'];
@@ -700,51 +673,21 @@ if($nilai < 0 || $nilai > 100){
     echo "<script>alert('Nilai 0-100');</script>"; exit;
 }
 
-// LOGIKA INPUT BARU (Mengecek tipe input)
-if($tipe_input == 'per_kelas') {
-    
-    // Validasi relasi mengajar khusus per_kelas
-    $cek = mysqli_query($conn,"
-    SELECT * FROM mengajar
-    WHERE guru_id='$guru_id'
-    AND mapel_id='$mapel_id'
-    AND kelas_id='$kelas_id'
-    ");
+$cek = mysqli_query($conn,"
+SELECT * FROM mengajar
+WHERE guru_id='$guru_id'
+AND mapel_id='$mapel_id'
+AND kelas_id=(SELECT kelas_id FROM siswa WHERE id='$siswa_id')
+");
 
-    if(mysqli_num_rows($cek)==0){
-        echo "<script>alert('Tidak diizinkan mengajar di kelas ini');</script>"; exit;
-    }
-
-    // Ambil semua siswa di kelas yang dipilih, dan looping query insert-nya
-    $get_siswa = mysqli_query($conn, "SELECT id FROM siswa WHERE kelas_id='$kelas_id'");
-    while($row_siswa = mysqli_fetch_assoc($get_siswa)){
-        $s_id = $row_siswa['id'];
-        mysqli_query($conn,"INSERT INTO nilai
-        (siswa_id,mapel_id,guru_id,nilai,jenis,tanggal,deskripsi)
-        VALUES('$s_id','$mapel_id','$guru_id','$nilai','$jenis','$tanggal','$desk')
-        ");
-    }
-
-} else {
-    // LOGIKA LAMA: Input untuk perorangan/siswa spesifik
-    $siswa_id = $_POST['siswa_id'];
-    
-    $cek = mysqli_query($conn,"
-    SELECT * FROM mengajar
-    WHERE guru_id='$guru_id'
-    AND mapel_id='$mapel_id'
-    AND kelas_id=(SELECT kelas_id FROM siswa WHERE id='$siswa_id')
-    ");
-
-    if(mysqli_num_rows($cek)==0){
-        echo "<script>alert('Tidak diizinkan');</script>"; exit;
-    }
-
-    mysqli_query($conn,"INSERT INTO nilai
-    (siswa_id,mapel_id,guru_id,nilai,jenis,tanggal,deskripsi)
-    VALUES('$siswa_id','$mapel_id','$guru_id','$nilai','$jenis','$tanggal','$desk')
-    ");
+if(mysqli_num_rows($cek)==0){
+    echo "<script>alert('Tidak diizinkan');</script>"; exit;
 }
+
+mysqli_query($conn,"INSERT INTO nilai
+(siswa_id,mapel_id,guru_id,nilai,jenis,tanggal,deskripsi)
+VALUES('$siswa_id','$mapel_id','$guru_id','$nilai','$jenis','$tanggal','$desk')
+");
 
 echo "<script>location='input_nilai.php';</script>";
 }
