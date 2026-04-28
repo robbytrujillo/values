@@ -100,7 +100,8 @@
 
     <!-- MOBILE -->
     <div class="mobile-sidebar d-md-none" id="mobileSidebar">
-        <h4 class="text-center text-white mb-4">📊 Admin</h4>
+        <h4 class="text-center text-white mb-4"><img src="../assets/images/logo-sma.png" width="35" class="mb-2">
+            Admin</h4>
 
         <a href="dashboard.php">Dashboard</a>
         <a href="siswa.php">Data Siswa</a>
@@ -119,7 +120,8 @@
 
             <!-- DESKTOP -->
             <nav class="col-md-2 d-none d-md-block sidebar">
-                <h4 class="text-center text-white mb-4">📊 Admin</h4>
+                <h4 class="text-center text-white mb-4"><img src="../assets/images/logo-sma.png" width="35"
+                        class="mb-2"> Panel Admin</h4>
 
                 <a href="dashboard.php">Dashboard</a>
                 <a href="siswa.php">Data Siswa</a>

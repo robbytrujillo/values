@@ -319,9 +319,9 @@ function tanggalIndonesia($tanggal) {
     <div class="container-fluid mt-4">
 
         <!-- HEADER -->
-        <div class="d-flex justify-content-between mb-3">
-            <h4>Input Nilai</h4>
-            <p>Welcome <strong style="color: red;"><?= $_SESSION['user']['nama']; ?></strong></p>
+        <div class="d-flex justify-content-between mb-3 text-center">
+            <h4>INPUT NILAI</h4>
+            <!-- <p>Welcome <strong style="color: red;"><?= $_SESSION['user']['nama']; ?></strong></p> -->
         </div>
 
         <!-- FILTER (VERSI CLEAN) -->
@@ -345,7 +345,7 @@ function tanggalIndonesia($tanggal) {
 
         <!-- BUTTON -->
         <button class="btn btn-primary mb-3 rounded-pill" data-toggle="modal" data-target="#modalForm">
-            Input Nilai
+            Tambah Nilai
         </button>
 
         <!-- IMPORT -->

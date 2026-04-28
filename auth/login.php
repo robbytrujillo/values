@@ -61,7 +61,11 @@
                             LogIn
                         </button>
 
-                        <footer class="footer-full text-center mt-auto py-3 bg-light border-top">
+                        <a href="../index.php" class="btn btn-transparant btn-block" style="color: red">
+                            Back to previous page
+                        </a>
+
+                        <footer class="footer-full text-center mt-auto py-1 bg-light border-top">
                             <div class="small" style="font-weight: bold">
                                 Copyright &copy; <?= date('Y'); ?>
                                 <a href="https://robbyilham.com/" target="_blank">by</a>
@@ -71,9 +75,7 @@
                     </form>
 
                 </div>
-                <a href="../index.php" style="color: red; text-align: center;">
-                    ← Back
-                </a>
+
             </div>
 
         </div>

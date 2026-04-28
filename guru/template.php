@@ -136,7 +136,7 @@
             <nav id="sidebarMenu" class="col-md-2 sidebar">
 
                 <h5 class="text-center text-white mb-4">
-                    <img src="../assets/images/logo-sma.png" width="35" class="mb-2"><br>
+                    <img src="../assets/images/logo-sma.png" width="35" class="mb-2">
                     PANEL GURU
                 </h5>
 
@@ -174,7 +174,7 @@
                     </button>
 
                     <h5 class="mb-0 font-weight-bold text-dark">
-                        Sistem Informasi Guru
+                        Panel Guru
                     </h5>
 
                     <span class="text-muted">
