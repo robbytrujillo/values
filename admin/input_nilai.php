@@ -196,9 +196,201 @@ if($nilai < 0 || $nilai> 100){ $gagal++; continue; }
 
 <head>
     <title>Admin Input Nilai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css">
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap4.min.css"> -->
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap4.min.css">
+
+    <style>
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .table {
+        width: 100% !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        border-radius: 20px;
+        padding: 5px 10px;
+    }
+
+    .dataTables_wrapper .dataTables_length select {
+        border-radius: 20px;
+    }
+
+    .btn {
+        border-radius: 30px !important;
+    }
+
+    .modal-content {
+        border-radius: 15px;
+    }
+
+    @media(max-width:767px) {
+        .form-inline {
+            display: block !important;
+        }
+
+        .form-inline .form-control,
+        .form-inline .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        h4 {
+            font-size: 20px;
+        }
+    }
+
+    table.dataTable {
+        width: 100% !important;
+        margin-top: 15px !important;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .dataTables_wrapper .row {
+        width: 100%;
+        margin: 0;
+    }
+
+    /* .dataTables_filter,
+    .dataTables_length {
+        margin-bottom: 15px;
+    }
+
+    .dataTables_filter input {
+        width: 220px !important;
+        max-width: 100%;
+    } */
+
+    /* DATATABLE TOP CONTROL */
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+        width: 50%;
+        margin-bottom: 15px;
+    }
+
+    .dataTables_wrapper .dataTables_length {
+        float: left;
+        text-align: left;
+    }
+
+    .dataTables_wrapper .dataTables_filter {
+        float: right;
+        text-align: right;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        margin-left: 8px;
+        display: inline-block;
+        width: 220px !important;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        float: left;
+        padding-top: 15px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+        float: right;
+        padding-top: 10px;
+    }
+
+    .dataTables_wrapper .row {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        margin: 0;
+    }
+
+    /* MOBILE */
+    @media(max-width:767px) {
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            width: 100%;
+            float: none;
+            text-align: left !important;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            width: 100% !important;
+            margin-left: 0;
+            margin-top: 8px;
+        }
+
+        .dataTables_wrapper .row {
+            display: block;
+        }
+
+        .dataTables_paginate {
+            margin-top: 15px;
+        }
+    }
+
+    @media(max-width:767px) {
+        .dataTables_filter {
+            text-align: left !important;
+        }
+
+        .dataTables_filter input {
+            width: 100% !important;
+        }
+
+        .dataTables_length,
+        .dataTables_filter {
+            width: 100%;
+        }
+
+        .pagination {
+            flex-wrap: wrap;
+        }
+    }
+
+    /* TABLE MOBILE */
+    #tableNilai th,
+    #tableNilai td {
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    #tableNilai th:last-child,
+    #tableNilai td:last-child {
+        min-width: 140px;
+        text-align: center;
+    }
+
+    /* BUTTON AKSI */
+    #tableNilai td .btn {
+        min-width: 70px;
+    }
+
+    @media(max-width:767px) {
+        #tableNilai td:last-child {
+            min-width: 120px;
+        }
+
+        #tableNilai td .d-flex {
+            align-items: center;
+        }
+
+        #tableNilai td .btn {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+    }
+    </style>
+
 </head>
 
 <body>
@@ -207,15 +399,26 @@ if($nilai < 0 || $nilai> 100){ $gagal++; continue; }
 
     <div class="container mt-4">
 
-        <h4>Input Nilai (Admin)</h4>
+        <h4 style="text-align: center; font-weight: bold">INPUT NILAI</h4>
 
         <!-- FILTER -->
-        <form method="GET" class="form-inline mb-3">
+        <!-- <form method="GET" class="form-inline mb-3">
             <select name="filter_jenis" class="form-control mr-2">
                 <option value="">Semua</option>
                 <option value="harian">Harian</option>
                 <option value="bulanan">Bulanan</option>
                 <option value="semester">Semester</option>
+            </select>
+            <button class="btn btn-primary btn-sm rounded-pill">Filter</button>
+        </form> -->
+
+        <!-- FILTER -->
+        <form method="GET" class="form-inline mb-3" style="text-align: center">
+            <select name="filter_jenis" class="form-control mr-2">
+                <option value="" <?= ($filter_jenis == '') ? 'selected' : '' ?>>Semua</option>
+                <option value="harian" <?= ($filter_jenis == 'harian') ? 'selected' : '' ?>>Harian</option>
+                <option value="bulanan" <?= ($filter_jenis == 'bulanan') ? 'selected' : '' ?>>Bulanan</option>
+                <option value="semester" <?= ($filter_jenis == 'semester') ? 'selected' : '' ?>>Semester</option>
             </select>
             <button class="btn btn-primary btn-sm rounded-pill">Filter</button>
         </form>
@@ -237,52 +440,75 @@ if($nilai < 0 || $nilai> 100){ $gagal++; continue; }
             </div>
         </div>
 
-        <button class="btn btn-primary mb-3 rounded-pill" data-toggle="modal" data-target="#modalTambah">
-            Input Nilai
+        <button class="btn btn-primary mb-3 rounded-pill text-center" data-toggle="modal" data-target="#modalTambah">
+            Tambah Nilai
         </button>
 
         <!-- TABLE -->
-        <table id="tableNilai" class="table table-bordered table-striped">
-            <thead class="thead-dark">
-                <tr>
-                    <th>No</th>
-                    <th>Siswa</th>
-                    <th>Kelas</th>
-                    <th>Mapel</th>
-                    <th>Nilai</th>
-                    <th>Jenis</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
 
-            <tbody>
-                <?php $no=1; while($d=mysqli_fetch_assoc($q)){ ?>
-                <tr>
-                    <td><?= $no++ ?></td>
-                    <td><?= $d['nama_siswa'] ?></td>
-                    <td><?= $d['nama_kelas'] ?></td>
-                    <td><?= $d['nama_mapel'] ?></td>
-                    <td><?= $d['nilai'] ?></td>
-                    <td><?= ucfirst($d['jenis']) ?></td>
-                    <td>
-                        <button class="btn btn-warning btn-sm rounded-pill" onclick="editData(
-            '<?= $d['id'] ?>',
-            '<?= $d['nilai'] ?>',
-            '<?= $d['jenis'] ?>',
-            '<?= $d['tanggal'] ?>',
-            '<?= htmlspecialchars($d['deskripsi'],ENT_QUOTES) ?>'
-        )">
-                            Edit
-                        </button>
+        <div class="table-responsive">
+            <table id="tableNilai" class="table table-bordered table-striped text-nowrap"
+                style="width:100%; min-width:900px;">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>No</th>
+                        <th>Siswa</th>
+                        <th>Kelas</th>
+                        <th>Mapel</th>
+                        <th>Nilai</th>
+                        <th>Jenis</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
 
-                        <button class="btn btn-danger btn-sm rounded-pill" onclick="hapusData('<?= $d['id'] ?>')">
-                            Hapus
-                        </button>
-                    </td>
-                </tr>
-                <?php } ?>
-            </tbody>
-        </table>
+                <tbody>
+                    <?php $no=1; while($d=mysqli_fetch_assoc($q)){ ?>
+                    <tr>
+                        <td><?= $no++ ?></td>
+                        <td><?= $d['nama_siswa'] ?></td>
+                        <td><?= $d['nama_kelas'] ?></td>
+                        <td><?= $d['nama_mapel'] ?></td>
+                        <td><?= $d['nilai'] ?></td>
+                        <td><?= ucfirst($d['jenis']) ?></td>
+                        <!-- <td>
+                            <button class="btn btn-warning btn-sm rounded-pill" onclick="editData(
+        '<?= $d['id'] ?>',
+        '<?= $d['nilai'] ?>',
+        '<?= $d['jenis'] ?>',
+        '<?= $d['tanggal'] ?>',
+        '<?= htmlspecialchars($d['deskripsi'],ENT_QUOTES) ?>'
+    )">
+                                Edit
+                            </button>
+
+                            <button class="btn btn-danger btn-sm rounded-pill" onclick="hapusData('<?= $d['id'] ?>')">
+                                Hapus
+                            </button>
+                        </td> -->
+
+                        <td>
+                            <div class="d-flex flex-column flex-md-row">
+                                <button class="btn btn-warning btn-sm mb-1 mr-md-1" onclick="editData(
+                                        '<?= $d['id'] ?>',
+                                        '<?= $d['nilai'] ?>',
+                                        '<?= $d['jenis'] ?>',
+                                        '<?= $d['tanggal'] ?>',
+                                        '<?= htmlspecialchars($d['deskripsi'],ENT_QUOTES) ?>'
+                                    )">
+                                    Edit
+                                </button>
+
+                                <button class="btn btn-danger btn-sm" onclick="hapusData('<?= $d['id'] ?>')">
+                                    Hapus
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+
+        </div>
 
     </div>
 
@@ -381,14 +607,42 @@ if($nilai < 0 || $nilai> 100){ $gagal++; continue; }
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- DataTable -->
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap4.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap4.min.js"></script>
 
-    <script>
+    <!-- <script>
     $(document).ready(function() {
         $('#tableNilai').DataTable({
             pageLength: 10,
             responsive: true
+        });
+    });
+    </script> -->
+
+    <script>
+    $(document).ready(function() {
+        $('#tableNilai').DataTable({
+            responsive: false,
+            autoWidth: false,
+            pageLength: 10,
+            scrollX: true,
+            columnDefs: [{
+                targets: -1,
+                orderable: false
+            }],
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan data: _MENU_",
+                zeroRecords: "Data tidak ditemukan",
+                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                paginate: {
+                    previous: "Sebelumnya",
+                    next: "Berikutnya"
+                }
+            }
         });
     });
     </script>

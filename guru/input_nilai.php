@@ -175,6 +175,141 @@ function tanggalIndonesia($tanggal) {
         min-width: 180px;
     }
     </style>
+
+    <style>
+    .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .btn {
+        border-radius: 30px !important;
+    }
+
+    .modal-content {
+        border-radius: 15px;
+    }
+
+    .table {
+        width: 100% !important;
+    }
+
+    table.dataTable {
+        width: 100% !important;
+        margin-top: 15px !important;
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        border-radius: 20px;
+        padding: 5px 10px;
+        width: 220px !important;
+    }
+
+    .dataTables_wrapper .dataTables_length select {
+        border-radius: 20px;
+    }
+
+    .dataTables_wrapper .dataTables_length,
+    .dataTables_wrapper .dataTables_filter {
+        width: 50%;
+        margin-bottom: 15px;
+    }
+
+    .dataTables_wrapper .dataTables_length {
+        float: left;
+        text-align: left;
+    }
+
+    .dataTables_wrapper .dataTables_filter {
+        float: right;
+        text-align: right;
+    }
+
+    .dataTables_wrapper .dataTables_info {
+        float: left;
+        padding-top: 15px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+        float: right;
+        padding-top: 10px;
+    }
+
+    .dataTables_wrapper .row {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        margin: 0;
+    }
+
+    /* TABLE MOBILE */
+    #tableNilai th,
+    #tableNilai td {
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    #tableNilai th:last-child,
+    #tableNilai td:last-child {
+        min-width: 150px;
+        text-align: center;
+    }
+
+    #tableNilai td .btn {
+        min-width: 70px;
+    }
+
+    /* MOBILE */
+    @media(max-width:767px) {
+
+        .form-inline {
+            display: block !important;
+        }
+
+        .form-inline .form-control,
+        .form-inline .btn {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            width: 100%;
+            float: none;
+            text-align: left !important;
+        }
+
+        .dataTables_wrapper .dataTables_filter input {
+            width: 100% !important;
+            margin-left: 0;
+            margin-top: 8px;
+        }
+
+        .dataTables_wrapper .row {
+            display: block;
+        }
+
+        .pagination {
+            flex-wrap: wrap;
+        }
+
+        #tableNilai td:last-child {
+            min-width: 120px;
+        }
+
+        #tableNilai td .btn {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+    }
+    </style>
 </head>
 
 <body>
@@ -228,62 +363,70 @@ function tanggalIndonesia($tanggal) {
         <div class="card">
             <div class="card-body">
 
-                <table id="tableNilai" class="table table-bordered">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>No</th>
-                            <th>Waktu</th>
-                            <th>Siswa</th>
-                            <th>Kelas</th>
-                            <th>Mapel</th>
-                            <th>Nilai</th>
-                            <th>Jenis</th>
-                            <th>Aksi</th>
-                        </tr>
-                    </thead>
+                <div class="table-responsive">
+                    <table id="tableNilai" class="table table-bordered table-striped text-nowrap"
+                        style="width:100%; min-width:1200px;">
 
-                    <tbody>
-                        <?php $no=1; while($d=mysqli_fetch_assoc($q)){ ?>
-                        <tr>
-                            <td><?= $no++ ?></td>
-                            <!-- <td><?= $d['tanggal'] ?></td> -->
-                            <td>
-                                <?= hariIndonesia($d['tanggal']); ?>,
-                                <?= tanggalIndonesia($d['tanggal']); ?>
-                            </td>
-                            <td><?= $d['nama_siswa'] ?></td>
-                            <td><?= $d['nama_kelas'] ?></td>
-                            <td><?= $d['nama_mapel'] ?></td>
-                            <td><?= $d['nilai'] ?></td>
-                            <td>
-                                <span class="badge badge-<?= 
-                                $d['jenis']=='harian'?'info':
-                                ($d['jenis']=='bulanan'?'warning':'success')
+                        <thead class="thead-dark text-center">
+                            <tr>
+                                <th>No</th>
+                                <th>Waktu</th>
+                                <th>Siswa</th>
+                                <th>Kelas</th>
+                                <th>Mapel</th>
+                                <th>Nilai</th>
+                                <th>Jenis</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <?php $no=1; while($d=mysqli_fetch_assoc($q)){ ?>
+                            <tr>
+                                <td><?= $no++ ?></td>
+
+                                <td>
+                                    <?= hariIndonesia($d['tanggal']); ?>,
+                                    <?= tanggalIndonesia($d['tanggal']); ?>
+                                </td>
+
+                                <td><?= $d['nama_siswa'] ?></td>
+                                <td><?= $d['nama_kelas'] ?></td>
+                                <td><?= $d['nama_mapel'] ?></td>
+                                <td><?= $d['nilai'] ?></td>
+
+                                <td>
+                                    <span class="badge badge-<?=
+                                $d['jenis']=='harian' ? 'info' :
+                                ($d['jenis']=='bulanan' ? 'warning' : 'success')
                             ?>">
-                                    <?= ucfirst($d['jenis']) ?>
-                                </span>
-                            </td>
-                            <td>
-                                <button class="btn btn-warning btn-sm rounded-pill" onclick="editData(
-                                    '<?= $d['id'] ?>',
-                                    '<?= $d['nilai'] ?>',
-                                    '<?= $d['jenis'] ?>',
-                                    '<?= $d['tanggal'] ?>',
-                                    '<?= htmlspecialchars($d['deskripsi'],ENT_QUOTES) ?>'
-                                )">
-                                    Edit
-                                </button>
+                                        <?= ucfirst($d['jenis']) ?>
+                                    </span>
+                                </td>
 
-                                <button class="btn btn-danger btn-sm rounded-pill"
-                                    onclick="hapusData('<?= $d['id'] ?>')">
-                                    Hapus
-                                </button>
-                            </td>
-                        </tr>
-                        <?php } ?>
-                    </tbody>
+                                <td>
+                                    <div class="d-flex flex-column flex-md-row">
+                                        <button class="btn btn-warning btn-sm mb-1 mr-md-1" onclick="editData(
+                                        '<?= $d['id'] ?>',
+                                        '<?= $d['nilai'] ?>',
+                                        '<?= $d['jenis'] ?>',
+                                        '<?= $d['tanggal'] ?>',
+                                        '<?= htmlspecialchars($d['deskripsi'],ENT_QUOTES) ?>'
+                                    )">
+                                            Edit
+                                        </button>
 
-                </table>
+                                        <button class="btn btn-danger btn-sm" onclick="hapusData('<?= $d['id'] ?>')">
+                                            Hapus
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <?php } ?>
+                        </tbody>
+
+                    </table>
+                </div>
 
             </div>
         </div>
@@ -425,7 +568,26 @@ function tanggalIndonesia($tanggal) {
 
     <script>
     $(document).ready(function() {
-        $('#tableNilai').DataTable();
+        $('#tableNilai').DataTable({
+            responsive: false,
+            autoWidth: false,
+            pageLength: 10,
+            scrollX: true,
+            columnDefs: [{
+                targets: -1,
+                orderable: false
+            }],
+            language: {
+                search: "Cari:",
+                lengthMenu: "Tampilkan data: _MENU_",
+                zeroRecords: "Data tidak ditemukan",
+                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                paginate: {
+                    previous: "Sebelumnya",
+                    next: "Berikutnya"
+                }
+            }
+        });
     });
     </script>
 
