@@ -20,7 +20,7 @@ if(isset($_SESSION['user'])){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Analisa Nilai SMA</title>
+    <title>Sistem Statistik Nilai SMA</title>
 
     <link rel="icon" type="image/png" href="assets/images/logo-sma.png">
 
@@ -150,7 +150,7 @@ if(isset($_SESSION['user'])){
 
         <!-- HERO -->
         <section class="hero container">
-            <h1 data-aos="fade-up">Sistem Analisa Nilai Siswa</h1>
+            <h1 data-aos="fade-up">Sistem Statistik Nilai Siswa</h1>
 
             <p class="text-muted mt-3" data-aos="fade-up" data-aos-delay="100">
                 Kelola nilai siswa, ranking, dan raport secara otomatis & modern
