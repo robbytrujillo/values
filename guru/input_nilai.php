@@ -386,11 +386,13 @@ function tanggalIndonesia($tanggal) {
                                 <td><?= $d['nama_mapel'] ?></td>
                                 <td><?= $d['nilai'] ?></td>
 
-                                <td>
+                                <td class="text-center">
                                     <span class="badge badge-<?=
-    $d['jenis']=='harian' ? 'info' :
-    ($d['jenis']=='bulanan' ? 'warning' : 'success')
-?>">
+                                                $d['jenis']=='harian' ? 'info' :
+                                                ($d['jenis']=='bulanan' ? 'warning' : 'success')
+                                            ?> px-3 py-2" style="border-radius: 30px">
+                                        <?= ucfirst($d['jenis']) ?>
+                                    </span>
                                 </td>
 
                                 <td>
