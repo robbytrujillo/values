@@ -227,15 +227,21 @@ $pages = ceil($total/$limit);
                             <td><?= $d['nama_mapel'] ?></td>
                             <td><?= $d['nama_kelas'] ?></td>
                             <td>
-                                <button class="btn btn-warning btn-sm" onclick="editData(
-                            '<?= $d['id'] ?>',
-                            '<?= $d['guru_id'] ?>',
-                            '<?= $d['mapel_id'] ?>',
-                            '<?= $d['kelas_id'] ?>'
-                        )">Edit</button>
+                                <div class="d-flex flex-column flex-md-row gap-1">
+                                    <button class="btn btn-warning btn-sm mb-1 mb-md-0 mr-md-1" onclick="editData(
+                '<?= $d['id'] ?>',
+                '<?= $d['guru_id'] ?>',
+                '<?= $d['mapel_id'] ?>',
+                '<?= $d['kelas_id'] ?>'
+            )">
+                                        Edit
+                                    </button>
 
-                                <a href="?hapus=<?= $d['id'] ?>" class="btn btn-danger btn-sm"
-                                    onclick="return confirm('Yakin?')">Hapus</a>
+                                    <a href="?hapus=<?= $d['id'] ?>" class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Yakin?')">
+                                        Hapus
+                                    </a>
+                                </div>
                             </td>
                         </tr>
                         <?php } ?>

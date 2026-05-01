@@ -1,34 +1,53 @@
-<?php 
+<?php
 include '../config/auth.php';
 cek_role(['guru']);
 include '../config/koneksi.php';
 
+$guru_id = $_SESSION['user']['id'];
+
 // ================= FILTER =================
 $jenis = $_GET['jenis'] ?? '';
-$where = ($jenis!='') ? "WHERE jenis='$jenis'" : "";
+$where_jenis = ($jenis != '') ? "AND n.jenis='$jenis'" : "";
 
-// ================= DATA =================
-$total_siswa = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM siswa"))['total'];
-$total_guru  = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM guru"))['total'];
+// ================= DATA GURU =================
+$total_guru = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM guru"))['total'];
 $total_mapel = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) as total FROM mapel"))['total'];
 
-// ================= STATISTIK NILAI =================
-$q1 = mysqli_fetch_assoc(mysqli_query($conn,"SELECT AVG(nilai) as rerata FROM nilai $where"));
-$rerata = round($q1['rerata'] ?? 0,2);
+// ================= DATA KHUSUS GURU =================
+$total_siswa = mysqli_fetch_assoc(mysqli_query($conn,"
+    SELECT COUNT(DISTINCT n.siswa_id) as total
+    FROM nilai n
+    WHERE n.guru_id='$guru_id' $where_jenis
+"))['total'];
 
-$q2 = mysqli_fetch_assoc(mysqli_query($conn,"SELECT MAX(nilai) as max_nilai FROM nilai $where"));
+$q1 = mysqli_fetch_assoc(mysqli_query($conn,"
+    SELECT AVG(n.nilai) as rerata
+    FROM nilai n
+    WHERE n.guru_id='$guru_id' $where_jenis
+"));
+$rerata = round($q1['rerata'] ?? 0, 2);
+
+$q2 = mysqli_fetch_assoc(mysqli_query($conn,"
+    SELECT MAX(n.nilai) as max_nilai
+    FROM nilai n
+    WHERE n.guru_id='$guru_id' $where_jenis
+"));
 $max = $q2['max_nilai'] ?? 0;
 
-$q3 = mysqli_fetch_assoc(mysqli_query($conn,"SELECT MIN(nilai) as min_nilai FROM nilai $where"));
+$q3 = mysqli_fetch_assoc(mysqli_query($conn,"
+    SELECT MIN(n.nilai) as min_nilai
+    FROM nilai n
+    WHERE n.guru_id='$guru_id' $where_jenis
+"));
 $min = $q3['min_nilai'] ?? 0;
 
 // ================= CHART MAPEL =================
 $data_mapel = mysqli_query($conn,"
-SELECT m.nama_mapel, AVG(n.nilai) as rata
-FROM nilai n
-JOIN mapel m ON n.mapel_id = m.id
-$where
-GROUP BY m.id
+    SELECT m.nama_mapel, AVG(n.nilai) as rata
+    FROM nilai n
+    JOIN mapel m ON n.mapel_id = m.id
+    WHERE n.guru_id='$guru_id' $where_jenis
+    GROUP BY m.id
 ");
 
 $labels = [];
@@ -36,38 +55,8 @@ $values = [];
 
 while($d = mysqli_fetch_assoc($data_mapel)){
     $labels[] = $d['nama_mapel'];
-    $values[] = round($d['rata'],2);
+    $values[] = round($d['rata'], 2);
 }
-
-$guru_id = $_SESSION['user']['id'];
-
-// total siswa yang dia ajar
-$total_siswa = mysqli_fetch_assoc(mysqli_query($conn,"
-SELECT COUNT(DISTINCT siswa_id) as total
-FROM nilai
-WHERE guru_id='$guru_id'
-"))['total'];
-
-// rata-rata nilai
-$rata = mysqli_fetch_assoc(mysqli_query($conn,"
-SELECT AVG(nilai) as rata
-FROM nilai
-WHERE guru_id='$guru_id'
-"))['rata'] ?? 0;
-
-// nilai tertinggi
-$max = mysqli_fetch_assoc(mysqli_query($conn,"
-SELECT MAX(nilai) as max
-FROM nilai
-WHERE guru_id='$guru_id'
-"))['max'] ?? 0;
-
-// nilai terendah
-$min = mysqli_fetch_assoc(mysqli_query($conn,"
-SELECT MIN(nilai) as min
-FROM nilai
-WHERE guru_id='$guru_id'
-"))['min'] ?? 0;
 ?>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -94,16 +83,53 @@ WHERE guru_id='$guru_id'
 
 .card-icon {
     font-size: 40px;
+    flex-shrink: 0;
 }
 
 .card-text {
     margin-left: 15px;
 }
 
-.card-gradient {
-    color: #fff;
-    border-radius: 15px;
-    background: linear-gradient(135deg, #6366f1, #3b82f6);
+/* FILTER RESPONSIVE */
+.filter-wrapper {
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+.filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    width: 100%;
+}
+
+.filter-select {
+    flex: 1;
+    min-width: 200px;
+}
+
+.btn-filter {
+    min-width: 120px;
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+    .filter-group {
+        flex-direction: column;
+    }
+
+    .filter-select {
+        width: 100%;
+        margin-bottom: 12px;
+    }
+
+    .btn-filter {
+        width: 100%;
+    }
+
+    .card-modern .card-body {
+        flex-direction: row;
+    }
 }
 </style>
 
@@ -115,14 +141,16 @@ WHERE guru_id='$guru_id'
     <br>
 
     <!-- FILTER -->
-    <form method="GET" class="form-inline mb-3">
-        <select name="jenis" class="form-control mr-2">
-            <option value="">Semua</option>
-            <option value="harian" <?= $jenis=='harian'?'selected':'' ?>>Harian</option>
-            <option value="bulanan" <?= $jenis=='bulanan'?'selected':'' ?>>Bulanan</option>
-            <option value="semester" <?= $jenis=='semester'?'selected':'' ?>>Semester</option>
-        </select>
-        <button class="btn btn-primary btn-sm">Filter</button>
+    <form method="GET" class="filter-wrapper mb-4">
+        <div class="filter-group">
+            <select name="jenis" class="form-control filter-select">
+                <option value="">Semua</option>
+                <option value="harian" <?= $jenis=='harian'?'selected':'' ?>>Harian</option>
+                <option value="bulanan" <?= $jenis=='bulanan'?'selected':'' ?>>Bulanan</option>
+                <option value="semester" <?= $jenis=='semester'?'selected':'' ?>>Semester</option>
+            </select>
+            <button class="btn btn-primary btn-filter">Filter</button>
+        </div>
     </form>
 
     <p>
