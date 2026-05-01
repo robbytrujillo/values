@@ -153,7 +153,7 @@
                     <i class="fas fa-trophy"></i> Peringkat
                 </a>
 
-                <a href="profil.php" class="<?= basename($_SERVER['PHP_SELF'])=='profil.php' ? 'active' : '' ?>">
+                <a href="profile.php" class="<?= basename($_SERVER['PHP_SELF'])=='profil.php' ? 'active' : '' ?>">
                     <i class="fas fa-user"></i> Profil
                 </a>
 
