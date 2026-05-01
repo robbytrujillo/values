@@ -105,7 +105,7 @@
         <h4 class="text-center text-white mb-4"><img src="../assets/images/logo-sma.png" width="35" class="mb-2">
             Admin</h4>
 
-        <a href="dashboard.php">Dashboard</a>
+        <a href="dashboard.php"><i class="fas fa-chart-line">Dashboard</a>
         <a href="siswa.php">Data Siswa</a>
         <a href="guru.php">Data Guru</a>
         <a href="mapel.php">Data Mapel</a>
